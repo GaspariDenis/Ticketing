@@ -19,7 +19,7 @@ object NetworkModule {
 
     @Provides
     @Singleton
-    fun provideOkHttpClient(apiService: AuthRepository, sharedPreferences: SharedPreferences) : OkHttpClient {
+    fun provideOkHttpClient(apiService: APIService, sharedPreferences: SharedPreferences) : OkHttpClient {
         return OkHttpClient.Builder()
             .addInterceptor(AuthInterceptor(sharedPreferences))
             .authenticator(TokenAuthenticator(apiService, sharedPreferences))
