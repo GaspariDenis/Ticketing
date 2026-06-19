@@ -1,10 +1,11 @@
-package com.example.ticketing.ui
+package com.example.ticketing.auth
 
+import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.ticketing.network.APIStatus
-import com.example.ticketing.network.User
-import com.example.ticketing.network.UserToken
+import com.example.ticketing.vo.User
+import com.example.ticketing.vo.UserToken
 import com.example.ticketing.repository.AuthRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
@@ -18,20 +19,30 @@ class AuthViewModel @Inject constructor(
     val repo : AuthRepository
 ) : ViewModel() {
 
-    private val _email = MutableStateFlow("")
-    private val _password = MutableStateFlow("")
+    private var _email = mutableStateOf("")
+    private var _password = mutableStateOf("")
 
     val errorEvent = MutableStateFlow("")
     val isLoading = MutableStateFlow(false)
 
+    val loginSuccess = MutableStateFlow(false)
+
     private var _userToken : UserToken = UserToken(null, null)
 
     fun setEmail(email: String) {
-        _email.update { email }
+        _email.value = email
     }
 
     fun setPassword(password : String) {
-        _password.update { password }
+        _password.value = password
+    }
+
+    fun getEmail() : String{
+        return _email.value
+    }
+
+    fun getPassword() : String{
+        return _password.value
     }
 
     fun login() {
@@ -49,6 +60,7 @@ class AuthViewModel @Inject constructor(
                 is APIStatus.Success -> {
                     _userToken = status.data
                     isLoading.update { false }
+                    loginSuccess.update { true }
                 }
                 is APIStatus.ErrorAPI -> {
                     errorEvent.update { status.errorMessage() }
@@ -61,5 +73,13 @@ class AuthViewModel @Inject constructor(
                 is APIStatus.Loading -> {}
             }
         }
+    }
+
+    fun checkField() : Boolean {
+        return _password.value.chars().count() > 8
+    }
+
+    fun resetErrorEvent() {
+        errorEvent.update { "" }
     }
 }

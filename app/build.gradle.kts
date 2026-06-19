@@ -4,6 +4,7 @@ plugins {
 
     id("com.google.devtools.ksp")
     id("com.google.dagger.hilt.android")
+    id("kotlinx-serialization")
 }
 
 android {
@@ -14,7 +15,7 @@ android {
 
     defaultConfig {
         applicationId = "com.example.ticketing"
-        minSdk = 37
+        minSdk = 28
         targetSdk = 37
         versionCode = 1
         versionName = "1.0"
@@ -62,6 +63,9 @@ dependencies {
     implementation(libs.androidx.compose.material)
     implementation(libs.androidx.compose.runtime.livedata)
     implementation(libs.androidx.lifecycle.viewmodel.compose)
+
+    implementation(libs.kotlinx.serialization.json)    // Coil
+    implementation(libs.coil.compose)
 
     implementation(libs.hilt.android)
     ksp(libs.hilt.android.compiler)

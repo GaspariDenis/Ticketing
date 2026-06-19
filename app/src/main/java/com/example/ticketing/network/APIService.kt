@@ -1,5 +1,14 @@
 package com.example.ticketing.network
 
+import com.example.ticketing.vo.APIErrors
+import com.example.ticketing.vo.Comment
+import com.example.ticketing.vo.DataPaged
+import com.example.ticketing.vo.Member
+import com.example.ticketing.vo.Project
+import com.example.ticketing.vo.RegisterUser
+import com.example.ticketing.vo.Ticket
+import com.example.ticketing.vo.User
+import com.example.ticketing.vo.UserToken
 import retrofit2.Response
 import retrofit2.http.Body
 import retrofit2.http.DELETE
@@ -35,10 +44,12 @@ interface APIService {
 //Projects
     @GET("/projects")
     suspend fun getAllUserProjects(
+        @Body userId: String
     ) : Response<List<Project>>
 
     @POST("/projects")
     suspend fun createProject(
+        @Body userId: String,
         @Body name : String,
         @Body description : String
     ) : Response<Project>

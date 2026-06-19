@@ -3,23 +3,18 @@ package com.example.ticketing.repository
 import android.util.Log
 import com.example.ticketing.network.APIService
 import com.example.ticketing.network.APIStatus
-import com.example.ticketing.network.RegisterUser
-import com.example.ticketing.network.User
-import com.example.ticketing.network.UserToken
-import com.example.ticketing.network.extractError
-import dagger.Module
-import dagger.hilt.InstallIn
-import dagger.hilt.components.SingletonComponent
+import com.example.ticketing.vo.RegisterUser
+import com.example.ticketing.vo.User
+import com.example.ticketing.vo.UserToken
+import com.example.ticketing.vo.extractError
 import javax.inject.Inject
 import javax.inject.Singleton
 
-@Module
-@InstallIn(SingletonComponent::class)
+@Singleton
 class AuthRepository @Inject constructor(val api : APIService) {
 
     private val tag = "AuthRepo"
 
-    @Singleton
     suspend fun fetchNewTokens(refreshToken: String) : APIStatus<UserToken?> {
         return try {
             val response = api.getNewTokens(refreshToken)
@@ -51,22 +46,27 @@ class AuthRepository @Inject constructor(val api : APIService) {
         }
     }
 
-    @Singleton
-    suspend fun logoutAccount(refreshToken: String) {
-        try {
+    suspend fun logoutAccount(refreshToken: String) : APIStatus<Unit> {
+        return try {
             val response = api.logoutAccount(refreshToken)
 
             when(response.code()) {
-                204 -> return //successful logout
-                401 -> throw Exception(extractError(response.errorBody()).error ?: "The format error for the given code was different from the documentation")
+                204 -> {
+                    Log.d(tag, "Logout successfully.")
+                    APIStatus.Success(Unit)
+                }
+                401 -> APIStatus.ErrorAPI(
+                    code = response.code(),
+                    error = extractError(response.errorBody())
+                )
                 else -> throw Exception("Error with code ${response.code()}, it's not handle.")
             }
         }catch (e : Exception) {
             Log.e(tag, e.message ?: "Unexpected error.")
+            APIStatus.Error(e)
         }
     }
 
-    @Singleton
     suspend fun loginAccount(user : User) : APIStatus<UserToken> {
         return try {
             val response = api.loginAccount(user)
@@ -91,7 +91,6 @@ class AuthRepository @Inject constructor(val api : APIService) {
         }
     }
 
-    @Singleton
     suspend fun registerAccount(account : RegisterUser) : APIStatus<User> {
         return try {
             val response = api.registerAccount(account)
