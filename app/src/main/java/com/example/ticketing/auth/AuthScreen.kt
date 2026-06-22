@@ -9,30 +9,43 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.text.input.TextObfuscationMode
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.OutlinedTextFieldDefaults
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.input.PasswordVisualTransformation
+import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavController
-import com.example.ticketing.Home
 import com.example.ticketing.R
+import com.example.ticketing.dashboard.Home
 import com.example.ticketing.ui.theme.Indaco
+import com.example.ticketing.ui.utils.Alert
+import com.example.ticketing.ui.utils.TextField
 import kotlinx.serialization.Serializable
 
 
@@ -47,21 +60,35 @@ fun AuthenticationScreen(
 ) {
     val triggerError by viewModel.errorEvent.collectAsStateWithLifecycle(initialValue = "")
 
-    val logged by viewModel.loginSuccess.collectAsStateWithLifecycle(initialValue = false)
+    val logged by viewModel.isLogged.collectAsStateWithLifecycle(initialValue = false)
 
-    if(logged)
-        nav.navigate(Home)
+    var email by remember { mutableStateOf("") }
+    var password by remember { mutableStateOf("") }
+
+
+    LaunchedEffect(true) {
+        viewModel.checkLogged()
+    }
+
+    LaunchedEffect(logged) {
+        if(logged)
+            nav.navigate(Home)
+    }
 
     Content(
         modifier = modifier,
         errorMessage = triggerError,
-        emailText = viewModel::getEmail,
+        email = email,
+        password = password,
         isValid = viewModel::checkField,
         onConfirm = viewModel::resetErrorEvent,
-        onChangeEmailText = viewModel::setEmail,
-        passwordText = viewModel::getPassword,
-        onChangePasswordText = viewModel::setPassword,
-        onClickButton = viewModel::login
+        onClickButton = viewModel::login,
+        onChangeEmailText = {str->
+            email = str
+        },
+        onChangePasswordText = {str->
+            password = str
+        }
     )
 }
 
@@ -69,12 +96,12 @@ fun AuthenticationScreen(
 private fun Content(
     modifier: Modifier = Modifier,
     errorMessage : String,
-    onClickButton : () -> Unit,
-    isValid : () -> Boolean,
+    email : String,
+    password : String,
+    onClickButton : (String, String) -> Unit,
+    isValid : (String, String) -> Boolean,
     onConfirm: () -> Unit,
-    emailText : () -> String,
     onChangeEmailText : (String) -> Unit,
-    passwordText : () -> String,
     onChangePasswordText: (String) -> Unit,
 ) {
 
@@ -102,44 +129,36 @@ private fun Content(
             )
         }
 
-        Text(
-            modifier = Modifier,
-            fontSize = 17.sp,
-            fontWeight = FontWeight.SemiBold,
-            color = Color(0xff9b86e7),
-            text = "Email"
-        )
-
         TextField(
             modifier = modifier,
-            text = emailText,
+            text = email,
+            labelText = "Email",
+            labelColor = Color(0xff9b86e7),
+            digitPassword = false,
+            onChange = onChangeEmailText,
             placeholder = {
                 Text("tu@azienda.com")
-            },
-            onChange = onChangeEmailText
-        )
-
-        Text(
-            modifier = Modifier,
-            fontSize = 17.sp,
-            fontWeight = FontWeight.SemiBold,
-            color = Color(0xff9b86e7),
-            text = "Password"
+            }
         )
 
         TextField(
             modifier = modifier,
-            text = passwordText,
+            text = password,
+            labelText = "Password",
+            labelColor = Color(0xff9b86e7),
+            digitPassword = true,
+            onChange = onChangePasswordText,
             placeholder = {
                 Text(
                     text = "password"
                 )
-            },
-            onChange = onChangePasswordText
+            }
         )
 
         Button(
-            onClick = onClickButton,
+            onClick = {
+                onClickButton(email, password)
+            },
             shape = RoundedCornerShape(16.dp),
             modifier = Modifier
                 .fillMaxWidth()
@@ -148,7 +167,7 @@ private fun Content(
             colors = ButtonDefaults.buttonColors(
                 containerColor = Color(0x00ffffff)
             ),
-            enabled = isValid(),
+            enabled = isValid(email, password),
             contentPadding = PaddingValues()
         ) {
             Box(
@@ -156,7 +175,7 @@ private fun Content(
                     .fillMaxSize()
                     .background(
                         brush =
-                            if (isValid()) Brush.horizontalGradient(
+                            if (isValid(email, password)) Brush.horizontalGradient(
                                 colors = listOf(Color(0xff845fee), Color(0xff4e80ee))
                             )
                             else
@@ -188,57 +207,4 @@ private fun Content(
             onDismiss = {}
         )
     }
-}
-
-@Composable
-fun TextField(
-    modifier: Modifier = Modifier,
-    placeholder: @Composable () -> Unit,
-    text : () -> String,
-    onChange : (String) -> Unit
-) {
-    OutlinedTextField(
-        modifier = modifier
-            .fillMaxWidth()
-            .padding(start = 16.dp, end = 16.dp),
-        placeholder = placeholder,
-        value = text(),
-        onValueChange = onChange,
-        shape = RoundedCornerShape(16.dp),
-        maxLines = 1,
-        colors = OutlinedTextFieldDefaults.colors(
-            focusedBorderColor = Indaco,
-            unfocusedBorderColor = Color.Gray,
-            unfocusedContainerColor = Color(0xff192032),
-            focusedContainerColor = Color(0xff192032)
-        )
-    )
-}
-
-@Composable
-fun Alert(
-    modifier: Modifier = Modifier,
-    title : String,
-    message : String,
-    onDismiss: () -> Unit,
-    onConfirm : () -> Unit,
-    ) {
-    AlertDialog(
-        modifier = modifier,
-        title = {
-            Text(title)
-        },
-        text = {
-            Text(message)
-        },
-        onDismissRequest = onDismiss,
-        confirmButton = {
-            TextButton(
-                onClick = onConfirm
-            ) {
-                Text("Ok")
-            }
-        },
-        dismissButton = {}
-    )
 }

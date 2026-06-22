@@ -19,5 +19,6 @@ data class User (
 @Serializable
 data class UserToken(
     val accessToken : String?,
-    val refreshToken: String?
+    val refreshToken: String?,
+    val id: String?
 )

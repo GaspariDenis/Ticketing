@@ -1,6 +1,7 @@
 package com.example.ticketing.auth
 
-import androidx.compose.runtime.mutableStateOf
+import android.text.TextUtils
+import android.util.Patterns
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.ticketing.network.APIStatus
@@ -10,6 +11,7 @@ import com.example.ticketing.repository.AuthRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import javax.inject.Inject
@@ -18,49 +20,28 @@ import javax.inject.Inject
 class AuthViewModel @Inject constructor(
     val repo : AuthRepository
 ) : ViewModel() {
-
-    private var _email = mutableStateOf("")
-    private var _password = mutableStateOf("")
-
     val errorEvent = MutableStateFlow("")
     val isLoading = MutableStateFlow(false)
 
-    val loginSuccess = MutableStateFlow(false)
+    var userToken : UserToken = UserToken(null, null, null)
 
-    private var _userToken : UserToken = UserToken(null, null)
+    var isLogged = MutableStateFlow(false)
 
-    fun setEmail(email: String) {
-        _email.value = email
-    }
-
-    fun setPassword(password : String) {
-        _password.value = password
-    }
-
-    fun getEmail() : String{
-        return _email.value
-    }
-
-    fun getPassword() : String{
-        return _password.value
-    }
-
-    fun login() {
+    fun login(email : String, password : String) {
         viewModelScope.launch(Dispatchers.IO) {
             isLoading.update { true }
             val status = repo.loginAccount(
                 User(
-                    email = _email.value,
-                    password = _password.value,
+                    email = email,
+                    password = password,
                     id = null
                 )
             )
 
             when(status){
                 is APIStatus.Success -> {
-                    _userToken = status.data
+                    userToken = status.data
                     isLoading.update { false }
-                    loginSuccess.update { true }
                 }
                 is APIStatus.ErrorAPI -> {
                     errorEvent.update { status.errorMessage() }
@@ -75,8 +56,35 @@ class AuthViewModel @Inject constructor(
         }
     }
 
-    fun checkField() : Boolean {
-        return _password.value.chars().count() > 8
+    fun checkField(email : String, password : String) : Boolean {
+        val email = email.trim()
+
+        if(password.chars().count() < 8){
+            //errorEvent.update { "La password deve avere minimo 8 caratteri." }
+            return false
+        }
+
+        if(TextUtils.isEmpty(email)){
+            //errorEvent.update { "Inserisci la tua mail." }
+            return false
+        }
+
+        if(!Patterns.EMAIL_ADDRESS.matcher(email).matches()){
+            //errorEvent.update { "Inserisci una mail valida." }
+            return false
+        }
+
+        return true
+    }
+
+    fun getUserId() : String{
+        return userToken.id ?: throw Exception("Id not found.")
+    }
+
+    fun checkLogged() {
+        viewModelScope.launch {
+            isLogged.update { repo.isLogged() }
+        }
     }
 
     fun resetErrorEvent() {

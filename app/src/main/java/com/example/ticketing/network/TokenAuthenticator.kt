@@ -2,6 +2,8 @@ package com.example.ticketing.network
 
 import android.content.SharedPreferences
 import android.util.Log
+import com.example.ticketing.repository.AuthRepository
+import com.example.ticketing.vo.DbToken
 import com.example.ticketing.vo.UserToken
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.runBlocking
@@ -14,13 +16,25 @@ import okhttp3.Route
 private const val tag = "TokenAuthenticator"
 
 class TokenAuthenticator(
-    private val apiService: APIService,
-    private val sharedPreferences: SharedPreferences
+    private val apiService: AuthRepository
 ) : Authenticator {
     override fun authenticate(route: Route?, response: Response): Request? {
         synchronized(this) {
-            val currentAccessToken = sharedPreferences.getString("access_token", null)
-            val refreshToken = sharedPreferences.getString("refresh_token", null) ?: return null
+            Log.d(tag, "called token authenticator.")
+
+            val currentAccessToken : String
+            val refreshToken : String
+
+            runBlocking {
+                withContext(Dispatchers.IO){
+                    val tmp = apiService.dao.getLocalToken()
+                    currentAccessToken = tmp.accessToken
+                    refreshToken = tmp.refreshToken
+                }
+            }
+
+            Log.d(tag, currentAccessToken ?: "")
+            Log.d(tag, response.request.header("Authorization")?.removePrefix("Bearer ") ?: "")
 
             if(currentAccessToken != response.request.header("Authorization")?.removePrefix("Bearer ")){
                 return response.request.newBuilder()
@@ -28,34 +42,32 @@ class TokenAuthenticator(
                     .build()
             }
 
-            val newTokensResponse = runBlocking {
+            //UserToken
+            val status : APIStatus<UserToken?>
+            runBlocking {
                 withContext(Dispatchers.IO){
-                    apiService.getNewTokens(refreshToken)
+                    status = apiService.fetchNewTokens(refreshToken)
                 }
             }
 
-            val token = try{ when(newTokensResponse.code()){
-                200 -> newTokensResponse.body() ?: UserToken(refreshToken, null)
-                400, 401 -> {
-                    runBlocking {
-                        withContext(Dispatchers.IO){
-                            apiService.logoutAccount(refreshToken)
-                        }
-                    }
-                    return null
+            val token = when(status){
+                is APIStatus.Success -> {
+                    status.data ?: UserToken("", "", "")
                 }
-                else -> {
-                    UserToken(refreshToken, null)
-                }
-            }}catch (e : Exception){
-                Log.e(tag, e.message ?: "Unexpected error.")
-                UserToken(refreshToken, null)
+                else -> UserToken("", "" , "")
             }
 
-            sharedPreferences.edit()
-                .putString("access_token", token.accessToken)
-                .putString("refresh_token", token.refreshToken)
-                .apply()
+            Log.d(tag, token.toString())
+
+            runBlocking {
+                withContext(Dispatchers.IO){
+                    apiService.dao.updateAccessToken(DbToken(
+                        userId = token.id ?: "",
+                        accessToken = token.accessToken ?: "",
+                        refreshToken = token.refreshToken ?: ""
+                    ))
+                }
+            }
 
             return response.request.newBuilder()
                 .header("Authorization", "Bearer ${token.accessToken}")

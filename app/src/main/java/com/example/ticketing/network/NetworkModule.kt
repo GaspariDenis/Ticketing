@@ -3,6 +3,7 @@ package com.example.ticketing.network
 import android.content.Context
 import android.content.SharedPreferences
 import androidx.navigation.Navigator
+import com.example.ticketing.repository.AuthRepository
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
@@ -14,7 +15,7 @@ import retrofit2.converter.gson.GsonConverterFactory
 import javax.inject.Named
 import javax.inject.Singleton
 
-private const val BASE_URL = "http://localhost:3000/"
+private const val BASE_URL = "http://192.168.1.30:3000/"
 private const val REFRESH = "refresh"
 
 @Module
@@ -50,22 +51,27 @@ object NetworkModule {
     fun provideRefreshApiService(@Named(REFRESH) retrofit: Retrofit) : APIService =
         retrofit.create(APIService::class.java)
 
+    @Provides
+    @Singleton
+    @Named(REFRESH)
+    fun provideRefreshBackend(@Named(REFRESH) apiService: APIService) : AuthRepository =
+        AuthRepository(apiService)
+
     //Authenticator
     @Provides
     @Singleton
     fun providetokenAuthenticator(
-    @Named(REFRESH) apiService: APIService,
-    sharedPreferences: SharedPreferences
+    @Named(REFRESH) apiService: AuthRepository
     ) : TokenAuthenticator =
-        TokenAuthenticator(apiService, sharedPreferences)
+        TokenAuthenticator(apiService)
 
     //Authenticated client
 
     @Provides
     @Singleton
-    fun provideOkHttpClient(authenticator: TokenAuthenticator, sharedPreferences: SharedPreferences) : OkHttpClient {
+    fun provideOkHttpClient(authenticator: TokenAuthenticator, @Named(REFRESH)repo : AuthRepository) : OkHttpClient {
         return OkHttpClient.Builder()
-            .addInterceptor(AuthInterceptor(sharedPreferences))
+            .addInterceptor(AuthInterceptor(repo))
             .authenticator(authenticator)
             .build()
     }

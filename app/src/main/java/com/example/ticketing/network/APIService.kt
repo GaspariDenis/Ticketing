@@ -9,6 +9,8 @@ import com.example.ticketing.vo.RegisterUser
 import com.example.ticketing.vo.Ticket
 import com.example.ticketing.vo.User
 import com.example.ticketing.vo.UserToken
+import com.google.gson.annotations.SerializedName
+import kotlinx.serialization.Serializable
 import retrofit2.Response
 import retrofit2.http.Body
 import retrofit2.http.DELETE
@@ -28,7 +30,7 @@ interface APIService {
     @POST("/auth/refresh")
     //Return the access token
     suspend fun getNewTokens(
-        @Body refreshToken: String
+        @Body refreshToken: RefreshTokenRequest
     ): Response<UserToken>
 
     @POST("/auth/login")
@@ -44,7 +46,6 @@ interface APIService {
 //Projects
     @GET("/projects")
     suspend fun getAllUserProjects(
-        @Body userId: String
     ) : Response<List<Project>>
 
     @POST("/projects")
@@ -83,6 +84,11 @@ interface APIService {
         @Path("id") projectId: String,
         @Path("userId") userId : String
     ) : Response<Nothing>
+
+    @GET("/projects/{id}/my-role")
+    suspend fun getRoleForProject(
+        @Path("id") projectId : String
+    ) : Response<Member>
 
 //Tickets
     @GET("/projects/{id}/tickets")
@@ -149,3 +155,8 @@ sealed interface APIStatus<out T> {
     }
     data class Error(val e : Throwable) : APIStatus<Nothing>
 }
+
+@Serializable
+data class RefreshTokenRequest(
+    val refreshToken: String
+)

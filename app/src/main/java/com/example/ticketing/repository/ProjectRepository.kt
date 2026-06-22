@@ -3,6 +3,7 @@ package com.example.ticketing.repository
 import android.util.Log
 import com.example.ticketing.network.APIService
 import com.example.ticketing.network.APIStatus
+import com.example.ticketing.vo.Member
 import com.example.ticketing.vo.Project
 import com.example.ticketing.vo.UIProject
 import com.example.ticketing.vo.extractError
@@ -15,15 +16,17 @@ class ProjectRepository @Inject constructor(
 ) {
     private val tag = "ProjectRepository"
 
-    suspend fun getAllProjects(userId : String) : APIStatus<List<Project>> {
+    suspend fun getAllProjects() : APIStatus<List<Project>> {
         return try{
-            val response = api.getAllUserProjects(userId)
+            val response = api.getAllUserProjects()
 
             when(response.code()){
                 200 -> {
+                    Log.d(tag, response.body().toString())
                     APIStatus.Success(response.body() ?: listOf())
                 }
                 401 -> {
+                    Log.e(tag, "code ${response.code()}: ${extractError(response.errorBody())}")
                     APIStatus.ErrorAPI(
                         code = response.code(),
                         error = extractError( response.errorBody())
@@ -117,6 +120,29 @@ class ProjectRepository @Inject constructor(
                     APIStatus.Success(Unit)
                 }
                 403, 404 -> {
+                    APIStatus.ErrorAPI(
+                        code = response.code(),
+                        error = extractError( response.errorBody())
+                    )
+                }
+                else -> throw Exception("Error with code ${response.code()}, it's not handle.")
+            }
+        }catch (e : Exception){
+            Log.e(tag, e.message ?: "Unexpected error")
+            APIStatus.Error(e)
+        }
+    }
+
+    suspend fun getRoleForProject(projectId: String) : APIStatus<Member> {
+        return try{
+            val response = api.getRoleForProject(projectId)
+
+            when(response.code()){
+                200 -> {
+                    Log.d(tag, "Project deleted successfully.")
+                    APIStatus.Success(response.body() ?: throw Exception("The body wa empty"))
+                }
+                401, 403, 404 -> {
                     APIStatus.ErrorAPI(
                         code = response.code(),
                         error = extractError( response.errorBody())
