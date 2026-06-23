@@ -1,27 +1,25 @@
 package com.example.ticketing.dashboard
 
+import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.ticketing.network.APIStatus
+import com.example.ticketing.repository.AuthRepository
 import com.example.ticketing.repository.ProjectRepository
 import com.example.ticketing.vo.Member
 import com.example.ticketing.vo.Project
-import com.example.ticketing.vo.UserTag
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.async
-import kotlinx.coroutines.awaitAll
 import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.flow
-import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.flowOn
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
+import javax.annotation.meta.When
 import javax.inject.Inject
 
 @HiltViewModel
 class dashboardViewModel @Inject constructor (
-    val repo : ProjectRepository
+    val repoProject : ProjectRepository,
+    val repoAuth : AuthRepository
 ) : ViewModel()  {
 
     private val tag = "dashboardViewModel"
@@ -36,7 +34,7 @@ class dashboardViewModel @Inject constructor (
 
     fun getAllProject () {
         viewModelScope.launch(Dispatchers.IO) {
-            val result = repo.getAllProjects()
+            val result = repoProject.getAllProjects()
             var prj = listOf<Project>()
 
             when(result){
@@ -48,7 +46,7 @@ class dashboardViewModel @Inject constructor (
 
             var i = 0
             while(i < prj.lastIndex) {
-                prj[i].role = (repo.getRoleForProject(prj[i].id ?: "") as APIStatus.Success).data.getRole()
+                prj[i].role = (repoProject.getRoleForProject(prj[i].id ?: "") as APIStatus.Success).data.getRole()
                 i++
             }
 
@@ -56,13 +54,38 @@ class dashboardViewModel @Inject constructor (
         }
     }
 
+    fun createProject(name : String, description: String) {
+        viewModelScope.launch(Dispatchers.IO) {
+            val result = repoProject.createProject(name, description)
+
+            when(result){
+                is APIStatus.Success -> { getAllProject() }
+                is APIStatus.Loading -> {}
+                is APIStatus.ErrorAPI -> errorEvent.update { result.errorMessage() }
+                is APIStatus.Error -> errorEvent.update { result.e.message ?: "" }
+            }
+        }
+    }
+
+    fun logoutUser() {
+        viewModelScope.launch(Dispatchers.IO) {
+            val status = repoAuth.logoutAccount()
+
+            when(status) {
+                is APIStatus.Success -> {}
+                is APIStatus.Loading -> {}
+                is APIStatus.ErrorAPI -> errorEvent.update { status.errorMessage() }
+                is APIStatus.Error -> errorEvent.update { status.e.message ?: "" }
+            }
+        }
+    }
 
     private suspend fun getRole(projectId: String) : Member {
-        val status = repo.getRoleForProject(projectId)
+        val status = repoProject.getRoleForProject(projectId)
         when(status) {
             is APIStatus.Success ->  return status.data
             else -> {}
         }
-        return Member(null, null, null)
+        return Member(null, null, null, null)
     }
 }

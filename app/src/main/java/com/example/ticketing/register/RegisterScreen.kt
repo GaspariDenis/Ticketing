@@ -1,4 +1,4 @@
-package com.example.ticketing.auth
+package com.example.ticketing.register
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
@@ -32,74 +32,65 @@ import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavController
 import com.example.ticketing.R
-import com.example.ticketing.dashboard.Home
-import com.example.ticketing.register.Register
 import com.example.ticketing.ui.utils.Alert
 import com.example.ticketing.ui.utils.TextField
 import kotlinx.serialization.Serializable
 
 @Serializable
-object Auth
+object Register
 
 @Composable
-fun AuthenticationScreen(
+fun RegisterScreen(
     modifier: Modifier = Modifier,
-    nav : NavController,
-    viewModel : AuthViewModel = hiltViewModel()
-) {
-    val triggerError by viewModel.errorEvent.collectAsStateWithLifecycle(initialValue = "")
+    viewModel: RegisterViewModel = hiltViewModel(),
+    nav : NavController
+){
 
-    val logged by viewModel.isLogged.collectAsStateWithLifecycle(initialValue = false)
+    val errorMessage by viewModel.errorEvent.collectAsStateWithLifecycle(initialValue = "")
 
-    var email by remember { mutableStateOf("") }
-    var password by remember { mutableStateOf("") }
+    val createAccount by viewModel.created.collectAsStateWithLifecycle(initialValue = false)
 
-
-    LaunchedEffect(true) {
-        viewModel.checkLogged()
+    LaunchedEffect(createAccount) {
+        if(createAccount)
+            nav.popBackStack()
     }
 
-    LaunchedEffect(logged) {
-        if(logged)
-            nav.navigate(Home)
-    }
-
-    Content(
+    Screen(
         modifier = modifier,
-        errorMessage = triggerError,
-        email = email,
-        password = password,
-        isValid = viewModel::checkField,
+        errorMessage = errorMessage,
         onConfirm = viewModel::resetErrorEvent,
-        onClickButton = viewModel::login,
-        onClickRegistryButton = { nav.navigate(Register) },
-        onChangeEmailText = {str->
-            email = str
-        },
-        onChangePasswordText = {str->
-            password = str
-        }
+        isValid = viewModel::checkField,
+        onClickButton = viewModel::registerUser
     )
 }
 
 @Composable
-private fun Content(
-    modifier: Modifier = Modifier,
+private fun Screen(
+    modifier : Modifier = Modifier,
     errorMessage : String,
-    email : String,
-    password : String,
-    onClickButton : (String, String) -> Unit,
-    onClickRegistryButton : () -> Unit,
-    isValid : (String, String) -> Boolean,
-    onConfirm: () -> Unit,
-    onChangeEmailText : (String) -> Unit,
-    onChangePasswordText: (String) -> Unit,
+    onConfirm : () -> Unit,
+    isValid : (String, String, String) -> Boolean,
+    onClickButton : (String, String, String) -> Unit
 ) {
+
+    var user by remember { mutableStateOf("") }
+    var email by remember { mutableStateOf("") }
+    var password by remember { mutableStateOf("") }
+
+    if(errorMessage != ""){
+        Alert(
+            modifier = modifier,
+            title = "Error",
+            message = errorMessage,
+            onConfirm = onConfirm,
+            onDismiss = {}
+        )
+    }
 
     Column(
         modifier = modifier
             .fillMaxSize(),
-        verticalArrangement = Arrangement.Center
+        verticalArrangement = Arrangement.spacedBy(8.dp, Alignment.CenterVertically)
     ){
         Column(
             modifier = Modifier
@@ -122,11 +113,23 @@ private fun Content(
 
         TextField(
             modifier = modifier,
+            text = user,
+            labelText = "UserName",
+            labelColor = Color(0xff9b86e7),
+            digitPassword = false,
+            onChange = {str -> user = str },
+            placeholder = {
+                Text("tu@azienda.com")
+            }
+        )
+
+        TextField(
+            modifier = modifier,
             text = email,
             labelText = "Email",
             labelColor = Color(0xff9b86e7),
             digitPassword = false,
-            onChange = onChangeEmailText,
+            onChange = {email = it},
             placeholder = {
                 Text("tu@azienda.com")
             }
@@ -138,7 +141,7 @@ private fun Content(
             labelText = "Password",
             labelColor = Color(0xff9b86e7),
             digitPassword = true,
-            onChange = onChangePasswordText,
+            onChange = {password = it},
             placeholder = {
                 Text(
                     text = "password"
@@ -148,7 +151,7 @@ private fun Content(
 
         Button(
             onClick = {
-                onClickButton(email, password)
+                onClickButton(user, email, password)
             },
             shape = RoundedCornerShape(16.dp),
             modifier = Modifier
@@ -158,7 +161,7 @@ private fun Content(
             colors = ButtonDefaults.buttonColors(
                 containerColor = Color(0x00ffffff)
             ),
-            enabled = isValid(email, password),
+            enabled = isValid(user, email, password),
             contentPadding = PaddingValues()
         ) {
             Box(
@@ -166,7 +169,7 @@ private fun Content(
                     .fillMaxSize()
                     .background(
                         brush =
-                            if (isValid(email, password)) Brush.horizontalGradient(
+                            if (isValid(user, email, password)) Brush.horizontalGradient(
                                 colors = listOf(Color(0xff845fee), Color(0xff4e80ee))
                             )
                             else
@@ -182,59 +185,9 @@ private fun Content(
                     fontWeight = FontWeight.Bold,
                     fontSize = 22.sp,
                     color = Color.White,
-                    text = stringResource(R.string.auth_access)
+                    text = "REGISTRATI"
                 )
             }
         }
-
-        Spacer(Modifier.padding(top = 16.dp))
-
-        //Register
-        Button(
-            onClick = onClickRegistryButton,
-            shape = RoundedCornerShape(16.dp),
-            modifier = Modifier
-                .fillMaxWidth()
-                .height(60.dp)
-                .padding(start = 16.dp, end = 16.dp),
-            colors = ButtonDefaults.buttonColors(
-                containerColor = Color(0x00ffffff)
-            ),
-            enabled = isValid(email, password),
-            contentPadding = PaddingValues()
-        ) {
-            Box(
-                modifier = Modifier
-                    .fillMaxSize()
-                    .background(
-                        brush = Brush.horizontalGradient(
-                            colors = listOf(
-                                Color(0xff845fee),
-                                Color(0xff4e80ee)
-                            )
-                        )
-                    ),
-                contentAlignment = Alignment.Center,
-            ){
-                Text(
-                    modifier = Modifier
-                    ,
-                    fontWeight = FontWeight.Bold,
-                    fontSize = 22.sp,
-                    color = Color.White,
-                    text = stringResource(R.string.registrati)
-                )
-            }
-        }
-    }
-
-    if(errorMessage != ""){
-        Alert(
-            modifier = modifier,
-            title = "Error",
-            message = errorMessage,
-            onConfirm = onConfirm,
-            onDismiss = {}
-        )
     }
 }

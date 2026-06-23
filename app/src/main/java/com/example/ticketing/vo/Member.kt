@@ -4,9 +4,10 @@ import kotlinx.serialization.Serializable
 
 @Serializable
 data class Member(
-    val email: String?,
-    val role : String?,
-    val userId : String?
+    val email: String? = null,
+    val role : String? = null,
+    val userId : String? = null,
+    val user : User? = null
 ){
 
     fun getRole() : UserTag {
@@ -24,4 +25,12 @@ enum class UserTag {
     owner,
     member,
     viewer
+}
+
+fun stringFromTag(tag: UserTag) : String{
+    return when(tag){
+        UserTag.owner -> "owner"
+        UserTag.member -> "member"
+        UserTag.viewer -> "viewer"
+    }
 }

@@ -2,4 +2,5 @@
     <string name="app_name">Ticketing</string>
     <string name="auth_text_credential">Inserisci le tue credenziali</string>
     <string name="auth_access">ACCEDI</string>
+    <string name="registrati">REGISTRATI</string>
 </resources>

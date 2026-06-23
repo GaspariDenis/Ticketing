@@ -34,7 +34,8 @@ class AuthViewModel @Inject constructor(
                 User(
                     email = email,
                     password = password,
-                    id = null
+                    id = null,
+                    name = null
                 )
             )
 

@@ -4,6 +4,7 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.text.TextAutoSize
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.OutlinedTextField
@@ -20,6 +21,7 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.text.input.VisualTransformation
+import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.example.ticketing.R
@@ -29,9 +31,11 @@ import com.example.ticketing.ui.theme.Indaco
 fun TextField(
     modifier: Modifier = Modifier,
     text :  String,
-    labelText : String,
-    labelColor: Color,
-    digitPassword : Boolean,
+    labelText : String = "",
+    labelColor: Color = Color(0x00000000),
+    digitPassword : Boolean = false,
+    singleLine : Boolean = true,
+    maxLine : Int = 1,
     placeholder: @Composable () -> Unit,
     onChange : (String) -> Unit
 ) {
@@ -50,7 +54,7 @@ fun TextField(
                 PasswordVisualTransformation()
             else
                 VisualTransformation.None,
-        maxLines = 1,
+        singleLine = singleLine,
         colors = OutlinedTextFieldDefaults.colors(
             focusedBorderColor = Indaco,
             unfocusedBorderColor = Color.Gray,
@@ -63,7 +67,9 @@ fun TextField(
                 fontSize = 17.sp,
                 fontWeight = FontWeight.SemiBold,
                 color = labelColor,
-                text = labelText
+                text = labelText,
+                overflow = TextOverflow.Ellipsis,
+                maxLines = maxLine
             )
         },
         trailingIcon = {

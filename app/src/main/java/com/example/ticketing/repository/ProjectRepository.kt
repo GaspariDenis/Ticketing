@@ -6,7 +6,10 @@ import com.example.ticketing.network.APIStatus
 import com.example.ticketing.vo.Member
 import com.example.ticketing.vo.Project
 import com.example.ticketing.vo.UIProject
+import com.example.ticketing.vo.UserTag
+import com.example.ticketing.vo.UserToken
 import com.example.ticketing.vo.extractError
+import com.example.ticketing.vo.stringFromTag
 import javax.inject.Inject
 import javax.inject.Singleton
 
@@ -40,13 +43,12 @@ class ProjectRepository @Inject constructor(
         }
     }
 
-    suspend fun createProject(userId: String, name : String, descriptor: String) : APIStatus<Project> {
+    suspend fun createProject(name : String, descriptor: String) : APIStatus<Project> {
         return try{
-            val response = api.createProject(
-                userId = userId,
+            val response = api.createProject(Project(
                 name = name,
                 description = descriptor
-            )
+            ))
 
             when(response.code()){
                 200 -> {
@@ -134,13 +136,63 @@ class ProjectRepository @Inject constructor(
     }
 
     suspend fun getRoleForProject(projectId: String) : APIStatus<Member> {
-        return try{
+        return try {
             val response = api.getRoleForProject(projectId)
 
-            when(response.code()){
+            when (response.code()) {
                 200 -> {
                     Log.d(tag, "Project deleted successfully.")
                     APIStatus.Success(response.body() ?: throw Exception("The body wa empty"))
+                }
+
+                401, 403, 404 -> {
+                    APIStatus.ErrorAPI(
+                        code = response.code(),
+                        error = extractError(response.errorBody())
+                    )
+                }
+
+                else -> throw Exception("Error with code ${response.code()}, it's not handle.")
+            }
+        } catch (e: Exception) {
+            Log.e(tag, e.message ?: "Unexpected error")
+            APIStatus.Error(e)
+        }
+    }
+
+    suspend fun addMemberFromProject(projectId: String, email: String, role: UserTag) : APIStatus<Member> {
+        return try {
+            val response = api.addMemberToProject(projectId, Member(email, stringFromTag(role)))
+
+            when (response.code()) {
+                201 -> {
+                    Log.d(tag, "Member added successfully.")
+                    APIStatus.Success(response.body() ?: throw Exception("The body wa empty"))
+                }
+
+                400, 401, 403, 404 -> {
+                    APIStatus.ErrorAPI(
+                        code = response.code(),
+                        error = extractError(response.errorBody())
+                    )
+                }
+
+                else -> throw Exception("Error with code ${response.code()}, it's not handle.")
+            }
+        } catch (e: Exception) {
+            Log.e(tag, e.message ?: "Unexpected error")
+            APIStatus.Error(e)
+        }
+    }
+
+    suspend fun removeMemberFromProject(projectId: String, userId: String) : APIStatus<Unit> {
+        return try{
+            val response = api.removeMemberFromProject(projectId, userId)
+
+            when(response.code()){
+                204 -> {
+                    Log.d(tag, "Member deleted successfully.")
+                    APIStatus.Success(Unit)
                 }
                 401, 403, 404 -> {
                     APIStatus.ErrorAPI(

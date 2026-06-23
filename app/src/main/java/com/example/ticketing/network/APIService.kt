@@ -1,5 +1,6 @@
 package com.example.ticketing.network
 
+import android.util.Log
 import com.example.ticketing.vo.APIErrors
 import com.example.ticketing.vo.Comment
 import com.example.ticketing.vo.DataPaged
@@ -41,7 +42,7 @@ interface APIService {
     @POST("/auth/logout")
     suspend fun logoutAccount(
         @Body refreshToken: String
-    ) : Response<Nothing>
+    ) : Response<String>
 
 //Projects
     @GET("/projects")
@@ -50,14 +51,12 @@ interface APIService {
 
     @POST("/projects")
     suspend fun createProject(
-        @Body userId: String,
-        @Body name : String,
-        @Body description : String
+        @Body project: Project
     ) : Response<Project>
 
-    @GET("/projects")
+    @GET("/projects/{id}")
     suspend fun getProject(
-        @Query("id") id : String
+        @Path("id") id : String
     ) : Response<Project>
 
     @PUT("/projects")
@@ -83,7 +82,7 @@ interface APIService {
     suspend fun removeMemberFromProject(
         @Path("id") projectId: String,
         @Path("userId") userId : String
-    ) : Response<Nothing>
+    ) : Response<String>
 
     @GET("/projects/{id}/my-role")
     suspend fun getRoleForProject(
@@ -94,32 +93,34 @@ interface APIService {
     @GET("/projects/{id}/tickets")
     suspend fun ticketsOfProject(
         @Path("id") projectId: String,
+        @Query("page") page: Int,
+        @Query("pageSize") pageSize : Int
     ) : Response<DataPaged<Ticket>>
 
     @POST("/projects/{id}/tickets")
     suspend fun createTickets(
         @Path("id") projectId: String,
         @Body ticket: Ticket
-    ) : Response<Nothing>
+    ) : Response<Ticket>
 
     @GET("/projects/{id}/tickets/{ticketId}")
     suspend fun ticketDetail(
         @Path("id") projectId: String,
         @Path("ticketId") ticketId: String
-    ) : Response<Nothing>
+    ) : Response<Ticket>
 
     @PUT("/projects/{id}/tickets/{ticketId}")
     suspend fun updateTicket(
         @Path("id") projectId: String,
         @Path("ticketId") ticketId: String,
         @Body ticket: Ticket
-    ) : Response<Nothing>
+    ) : Response<Ticket>
 
     @DELETE("/projects/{id}/tickets/{ticketId}")
     suspend fun deleteTicket(
         @Path("id") projectId: String,
         @Path("ticketId") ticketId: String
-    ) : Response<Nothing>
+    ) : Response<String>
 
 //Comments
     @GET("/projects/{id}/tickets/{ticketId}/comments")
@@ -148,9 +149,10 @@ sealed interface APIStatus<out T> {
     object Loading : APIStatus<Nothing>
     data class ErrorAPI(val error : APIErrors, val code : Int) : APIStatus<Nothing> {
         fun errorMessage() : String {
+            Log.e("ErrorAPI", error.error ?: "")
             if(code == 400)
-                return error.errors?.toString() ?: "The format error for the given code was different from the documentation"
-            return error.error ?: "The format error for the given code was different from the documentation"
+                return error.errors?.toString() ?: "The format error for the given code($code) was different from the documentation"
+            return error.error ?: "The format error for the given code($code) was different from the documentation"
         }
     }
     data class Error(val e : Throwable) : APIStatus<Nothing>

@@ -22,14 +22,19 @@ class TokenAuthenticator(
         synchronized(this) {
             Log.d(tag, "called token authenticator.")
 
-            val currentAccessToken : String
-            val refreshToken : String
+            var currentAccessToken : String
+            var refreshToken : String
 
             runBlocking {
                 withContext(Dispatchers.IO){
-                    val tmp = apiService.dao.getLocalToken()
-                    currentAccessToken = tmp.accessToken
-                    refreshToken = tmp.refreshToken
+                    try {
+                        val tmp = apiService.dao.getLocalToken()
+                        currentAccessToken = tmp.accessToken
+                        refreshToken = tmp.refreshToken
+                    }catch (e : Exception) {
+                        currentAccessToken = ""
+                        refreshToken = ""
+                    }
                 }
             }
 

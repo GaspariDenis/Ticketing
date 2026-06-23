@@ -33,7 +33,7 @@ class AuthRepository @Inject constructor(val api : APIService) {
         val dbValue : DbToken
         withContext(Dispatchers.IO){
             dbValue = dao.getLocalToken()
-            dao.removeLocalToken(dbValue)
+            dao.removeLocalToken(dbValue.userId)
         }
 
         return UserToken(
@@ -103,15 +103,15 @@ class AuthRepository @Inject constructor(val api : APIService) {
         }
     }
 
-    suspend fun logoutAccount(refreshToken: String) : APIStatus<Unit> {
+    suspend fun logoutAccount() : APIStatus<Unit> {
         return try {
-            val response = api.logoutAccount(refreshToken)
             val dbtoken = dao.getLocalToken()
+            dao.removeLocalToken(dbtoken.userId)
+            val response = api.logoutAccount(dbtoken.refreshToken)
 
             when(response.code()) {
                 204 -> {
                     Log.d(tag, "Logout successfully.")
-                    dao.removeLocalToken(dbtoken)
                     APIStatus.Success(Unit)
                 }
                 401 -> APIStatus.ErrorAPI(
@@ -132,7 +132,7 @@ class AuthRepository @Inject constructor(val api : APIService) {
 
             try {
                 val local = dao.getLocalToken()
-                dao.removeLocalToken(local)
+                dao.removeLocalToken(local.userId)
             }catch (e : Exception) {}
 
             return when(response.code()) {

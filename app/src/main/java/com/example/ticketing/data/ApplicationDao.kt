@@ -2,7 +2,6 @@ package com.example.ticketing.data
 
 import androidx.room.Dao
 import androidx.room.Database
-import androidx.room.Delete
 import androidx.room.Insert
 import androidx.room.Query
 import androidx.room.RoomDatabase
@@ -20,8 +19,8 @@ interface ApplicationDao {
     @Update
     fun updateAccessToken(token : DbToken)
 
-    @Delete
-    fun removeLocalToken(token: DbToken)
+    @Query("delete from token where userId = :userID")
+    fun removeLocalToken(userID: String)
 }
 
 @Database(entities = [DbToken::class], version = 1, exportSchema = false)

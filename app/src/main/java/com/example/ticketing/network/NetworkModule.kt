@@ -15,7 +15,7 @@ import retrofit2.converter.gson.GsonConverterFactory
 import javax.inject.Named
 import javax.inject.Singleton
 
-private const val BASE_URL = "http://192.168.1.30:3000/"
+private const val BASE_URL = "http://192.168.1.43:3000/"
 private const val REFRESH = "refresh"
 
 @Module
