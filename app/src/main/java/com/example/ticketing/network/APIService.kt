@@ -126,7 +126,8 @@ interface APIService {
     @GET("/projects/{id}/tickets/{ticketId}/comments")
     suspend fun getAllComments(
         @Path("id") projectId: String,
-        @Path("ticketId") ticketId: String
+        @Path("ticketId") ticketId: String,
+        @Query("page") page : Int
     ) : Response<DataPaged<Comment>>
 
     @POST("/projects/{id}/tickets/{ticketId}/comments")

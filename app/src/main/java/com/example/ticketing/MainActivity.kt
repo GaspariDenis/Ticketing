@@ -27,6 +27,8 @@ import com.example.ticketing.register.Register
 import com.example.ticketing.register.RegisterScreen
 import com.example.ticketing.ticketChange.TicketCreation
 import com.example.ticketing.ticketChange.TicketChangeScreen
+import com.example.ticketing.ticketDetails.TicketDetails
+import com.example.ticketing.ticketDetails.TicketDetailsScreen
 import com.example.ticketing.ui.theme.TicketingTheme
 import com.example.ticketing.vo.Member
 import com.example.ticketing.vo.MemberListCustomNavType
@@ -34,6 +36,8 @@ import com.example.ticketing.vo.Project
 import com.example.ticketing.vo.ProjectCustomNavType
 import com.example.ticketing.vo.Ticket
 import com.example.ticketing.vo.TicketCustomNavType
+import com.example.ticketing.vo.UserTag
+import com.example.ticketing.vo.UserTagCustomNavType
 import dagger.hilt.android.AndroidEntryPoint
 import kotlin.reflect.typeOf
 
@@ -75,24 +79,31 @@ class MainActivity : ComponentActivity() {
                             )
                         }
                         composable<DashboardTickets>(
-                            typeMap = mapOf(typeOf<Project>() to ProjectCustomNavType)
+                            typeMap = mapOf(typeOf<Project>() to ProjectCustomNavType,
+                                            typeOf<List<Member>>() to MemberListCustomNavType,
+                                            typeOf<UserTag>() to UserTagCustomNavType
+                            )
                         ) {fallback ->
                             DashboardTicketsScreen(
                                 project = fallback.toRoute<DashboardTickets>().project,
                                 modifier = Modifier.padding(innerPadding),
-                                nav = navController
+                                nav = navController,
+                                youTag = fallback.toRoute<DashboardTickets>().youTag,
+                                projectMembers = fallback.toRoute<DashboardTickets>().projectMembers
                             )
                         }
                         composable<TicketCreation>(
                             typeMap = mapOf(typeOf<Ticket>() to TicketCustomNavType,
-                                            typeOf<List<Member>>() to MemberListCustomNavType
+                                            typeOf<List<Member>>() to MemberListCustomNavType,
+                                            typeOf<UserTag>() to UserTagCustomNavType
                             )
                         ){ fallback ->
                             TicketChangeScreen(
                                 modifier = Modifier.padding(innerPadding),
                                 nav = navController,
                                 ticket = fallback.toRoute<TicketCreation>().ticket,
-                                members = fallback.toRoute<TicketCreation>().members
+                                members = fallback.toRoute<TicketCreation>().members,
+                                youTag = fallback.toRoute<TicketCreation>().userTag
                             )
                         }
                         composable<ProjectSetting>(
@@ -102,6 +113,20 @@ class MainActivity : ComponentActivity() {
                                 modifier = Modifier.padding(innerPadding),
                                 nav = navController,
                                 project = fallback.toRoute<ProjectSetting>().project
+                            )
+                        }
+                        composable<TicketDetails>(
+                            typeMap = mapOf(typeOf<List<Member>>() to MemberListCustomNavType,
+                                typeOf<UserTag>() to UserTagCustomNavType
+                            )
+                        ) { fallback ->
+                            TicketDetailsScreen(
+                                modifier = Modifier.padding(innerPadding),
+                                nav = navController,
+                                youTag = fallback.toRoute<TicketDetails>().youTag,
+                                projectMembers = fallback.toRoute<TicketDetails>().listOfMember,
+                                projectId = fallback.toRoute<TicketDetails>().projectId,
+                                ticketId = fallback.toRoute<TicketDetails>().ticketId
                             )
                         }
                     }

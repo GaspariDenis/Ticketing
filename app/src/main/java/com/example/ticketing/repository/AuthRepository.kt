@@ -29,11 +29,11 @@ class AuthRepository @Inject constructor(val api : APIService) {
 
     val dao = db.appDao()
 
+
     suspend fun getUserDb()  : UserToken {
         val dbValue : DbToken
         withContext(Dispatchers.IO){
             dbValue = dao.getLocalToken()
-            dao.removeLocalToken(dbValue.userId)
         }
 
         return UserToken(

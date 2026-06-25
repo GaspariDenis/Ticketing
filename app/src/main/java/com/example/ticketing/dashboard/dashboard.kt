@@ -262,7 +262,9 @@ fun ProjectCard(
         modifier = modifier
             .padding(top = 14.dp)
             .clickable(onClick = {
-                nav.navigate(ProjectDetails(projectId = projectId, userTag = userTag))
+                nav.navigate(ProjectDetails(
+                    projectId = projectId,
+                    userTag = userTag))
             }),
     ) {
         Column(

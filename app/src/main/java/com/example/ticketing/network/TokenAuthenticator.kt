@@ -32,13 +32,14 @@ class TokenAuthenticator(
                         currentAccessToken = tmp.accessToken
                         refreshToken = tmp.refreshToken
                     }catch (e : Exception) {
+                        Log.e(tag, e.message ?: "Unexpected error.")
                         currentAccessToken = ""
                         refreshToken = ""
                     }
                 }
             }
 
-            Log.d(tag, currentAccessToken ?: "")
+            Log.d(tag, "current access token -> $currentAccessToken")
             Log.d(tag, response.request.header("Authorization")?.removePrefix("Bearer ") ?: "")
 
             if(currentAccessToken != response.request.header("Authorization")?.removePrefix("Bearer ")){
@@ -57,8 +58,10 @@ class TokenAuthenticator(
 
             val token = when(status){
                 is APIStatus.Success -> {
-                    status.data ?: UserToken("", "", "")
+                    status.data ?: throw Exception("the body was empty.")
                 }
+                is APIStatus.ErrorAPI -> {throw Exception(status.errorMessage())}
+                is APIStatus.Error -> {throw Exception(status.e.message ?: "Unknown message.")}
                 else -> UserToken("", "" , "")
             }
 

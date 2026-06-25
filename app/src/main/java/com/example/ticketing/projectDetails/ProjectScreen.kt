@@ -93,7 +93,9 @@ fun ProjectDetailsScreen(
         error = triggerError,
         seeTickets = { nav.navigate(DashboardTickets(
             projectId = projectId,
-            project = project
+            project = project,
+            youTag = userTag,
+            projectMembers = project.members ?: listOf()
         )) },
         onClickSetting = { nav.navigate(ProjectSetting(project = project)) },
         onClickBackArrow = { nav.popBackStack() },

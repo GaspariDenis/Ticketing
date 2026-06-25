@@ -18,9 +18,9 @@ class CommentRepository @Inject constructor(
 ) {
     private val tag = "CommentRepository"
 
-    suspend fun getComments(projectId: String, ticketId: String) : APIStatus<DataPaged<Comment>> {
+    suspend fun getComments(projectId: String, ticketId: String, page : Int) : APIStatus<DataPaged<Comment>> {
         return try{
-            val response = api.getAllComments(projectId, ticketId)
+            val response = api.getAllComments(projectId, ticketId, page)
 
             when(response.code()){
                 200 -> {
@@ -47,7 +47,7 @@ class CommentRepository @Inject constructor(
             val response = api.createComment(projectId, ticketId, comment)
 
             when(response.code()){
-                200 -> {
+                201 -> {
                     APIStatus.Success(response.body() ?: throw Exception())
                 }
                 400, 401, 403, 404 -> {

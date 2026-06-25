@@ -8,12 +8,15 @@ import com.example.ticketing.repository.TicketRepository
 import com.example.ticketing.vo.Member
 import com.example.ticketing.vo.PriorityTag
 import com.example.ticketing.vo.Ticket
+import com.example.ticketing.vo.TicketStatus
 import com.example.ticketing.vo.getStringFromPriorityTag
+import com.example.ticketing.vo.getStringFromStatusTag
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 import javax.inject.Inject
 
 @HiltViewModel
@@ -30,20 +33,20 @@ class TicketChangeViewModel @Inject constructor(
         errorEvent.update { "" }
     }
 
-    fun isValid(title: String, description : String, person : Member) : Boolean {
+    fun isValid(title: String, description : String, person : String) : Boolean {
         if(title == "")
             return false
 
         if(description == "")
             return false
 
-        if(person.userId.isNullOrEmpty())
+        if(person == "")
             return false
 
         return true
     }
 
-    fun createTicket(projectId : String, title: String, description: String, priorityTag: PriorityTag, member: Member) {
+    fun createTicket(projectId : String, title: String, description: String, priorityTag: PriorityTag, userId : String) {
         viewModelScope.launch(Dispatchers.IO) {
             val status = repo.createTicket(
                 projectId,
@@ -51,7 +54,7 @@ class TicketChangeViewModel @Inject constructor(
                     title = title,
                     description = description,
                     priority = getStringFromPriorityTag(priorityTag),
-                    assigneeId = member.userId
+                    assigneeId = userId
                 )
             )
 
@@ -60,6 +63,53 @@ class TicketChangeViewModel @Inject constructor(
                 is APIStatus.Loading -> {}
                 is APIStatus.Error -> { errorEvent.update { status.e.message ?: "Unexpected Error." } }
                 is APIStatus.ErrorAPI -> { errorEvent.update { status.errorMessage() } }
+            }
+        }
+    }
+
+    fun updateTicket(
+        projectId: String,
+        ticketId : String,
+        title: String,
+        description: String,
+        status: TicketStatus,
+        priorityTag: PriorityTag,
+        userId: String,
+        oncSuccess : () -> Unit) {
+        viewModelScope.launch(Dispatchers.IO) {
+            val status = repo.updateTicket(projectId, ticketId, Ticket(
+                title = title,
+                description = description,
+                status = getStringFromStatusTag(status),
+                priority = getStringFromPriorityTag(priorityTag),
+                assigneeId = userId
+            ) )
+
+            when(status) {
+                is APIStatus.ErrorAPI -> { errorEvent.update { status.errorMessage() } }
+                is APIStatus.Error -> { errorEvent.update { status.e.message ?: "Unexpected error" } }
+                is APIStatus.Loading -> {}
+                is APIStatus.Success -> {
+                    withContext(Dispatchers.Main) {
+                        oncSuccess()
+                    }
+                }
+            }
+        }
+    }
+
+    fun deleteTicket(projectId: String, ticketId: String, oncSuccess: () -> Unit) {
+        viewModelScope.launch(Dispatchers.IO) {
+            val status = repo.deleteTicket(projectId, ticketId)
+
+            when(status) {
+                is APIStatus.ErrorAPI -> { errorEvent.update { status.errorMessage() } }
+                is APIStatus.Error -> { errorEvent.update { status.e.message ?: "Unexpected error" } }
+                is APIStatus.Loading -> {}
+                is APIStatus.Success -> {
+                    withContext(Dispatchers.Main){
+                        oncSuccess()
+                    } }
             }
         }
     }

@@ -38,6 +38,24 @@ fun stringFromTag(tag: UserTag) : String{
     }
 }
 
+val UserTagCustomNavType = object : NavType<UserTag>(isNullableAllowed = false) {
+    override fun put(bundle: Bundle, key: String, value: UserTag) {
+        bundle.putSerializable(key, Json.encodeToString(value))
+    }
+
+    override fun get(bundle: Bundle, key: String): UserTag? {
+        return bundle.getString(key)?.let { Json.decodeFromString(it) }
+    }
+
+    override fun parseValue(value: String): UserTag {
+        return Json.decodeFromString(android.net.Uri.decode(value))
+    }
+
+    override fun serializeAsValue(value: UserTag): String {
+        return android.net.Uri.encode(Json.encodeToString(value))
+    }
+}
+
 val MemberCustomNavType = object : NavType<Member>(isNullableAllowed = false) {
     override fun put(bundle: Bundle, key: String, value: Member) {
         bundle.putSerializable(key, Json.encodeToString(value))

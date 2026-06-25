@@ -120,7 +120,6 @@ private fun Content(
         }
 
         TextField(
-            modifier = modifier,
             text = email,
             labelText = "Email",
             labelColor = Color(0xff9b86e7),
@@ -128,11 +127,11 @@ private fun Content(
             onChange = onChangeEmailText,
             placeholder = {
                 Text("tu@azienda.com")
-            }
+            },
+            modifier = Modifier.padding(top = 16.dp)
         )
 
         TextField(
-            modifier = modifier,
             text = password,
             labelText = "Password",
             labelColor = Color(0xff9b86e7),
@@ -142,10 +141,11 @@ private fun Content(
                 Text(
                     text = "password"
                 )
-            }
+            },
+            modifier = Modifier.padding(top = 16.dp, bottom = 48.dp)
         )
 
-        Spacer(Modifier.padding(top = 16.dp))
+        Spacer(Modifier.height(16.dp))
 
         Button(
             onClick = {

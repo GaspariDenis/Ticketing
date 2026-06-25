@@ -4,6 +4,10 @@ import android.os.Bundle
 import androidx.navigation.NavType
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.json.Json
+import java.time.Instant
+import java.time.ZoneId
+import java.time.format.DateTimeFormatter
+import java.util.Locale
 
 @Serializable
 data class Ticket(
@@ -24,7 +28,7 @@ data class Ticket(
         return when(status){
             "open" -> TicketStatus.open
             "closed" -> TicketStatus.closed
-            "progress" -> TicketStatus.in_progress
+            "in_progress" -> TicketStatus.in_progress
             else -> TicketStatus.open
         }
     }
@@ -36,6 +40,20 @@ data class Ticket(
             "low" -> PriorityTag.low
             else -> PriorityTag.low
         }
+    }
+
+    fun getFormattedDate() : String {
+        if(createdAt.isNullOrEmpty())
+            return ""
+
+        val instant = Instant.parse(createdAt)
+
+        val fusoOrario = ZoneId.systemDefault()
+
+        val formatter = DateTimeFormatter.ofPattern("dd/MM/yyyy HH:mm:ss", Locale.ITALY)
+            .withZone(fusoOrario)
+
+        return formatter.format(instant)
     }
 }
 
@@ -61,6 +79,14 @@ fun getStringFromPriorityTag(tag : PriorityTag) : String {
         PriorityTag.low -> "low"
         PriorityTag.medium -> "medium"
         PriorityTag.high -> "high"
+    }
+}
+
+fun getStringFromStatusTag(tag : TicketStatus) : String {
+    return when(tag) {
+        TicketStatus.open -> "open"
+        TicketStatus.in_progress -> "in_progress"
+        TicketStatus.closed -> "closed"
     }
 }
 

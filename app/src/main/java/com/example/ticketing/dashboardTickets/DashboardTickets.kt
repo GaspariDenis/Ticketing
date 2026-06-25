@@ -1,5 +1,6 @@
 package com.example.ticketing.dashboardTickets
 
+import android.util.Log
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -36,17 +37,22 @@ import androidx.paging.compose.collectAsLazyPagingItems
 import androidx.paging.compose.itemKey
 import com.example.ticketing.R
 import com.example.ticketing.ticketChange.TicketCreation
+import com.example.ticketing.ticketDetails.TicketDetails
 import com.example.ticketing.ui.utils.PriorityTagCard
 import com.example.ticketing.vo.MagicTicket
+import com.example.ticketing.vo.Member
 import com.example.ticketing.vo.Project
 import com.example.ticketing.vo.Ticket
 import com.example.ticketing.vo.TicketStatus
+import com.example.ticketing.vo.UserTag
 import kotlinx.serialization.Serializable
 
 @Serializable
 data class DashboardTickets(
     val projectId: String,
-    val project : Project
+    val project : Project,
+    val youTag : UserTag,
+    val projectMembers : List<Member>
 )
 
 @Composable
@@ -54,28 +60,45 @@ fun DashboardTicketsScreen(
     modifier : Modifier = Modifier,
     viewModel: TicketsViewModel = hiltViewModel(),
     project: Project,
+    youTag: UserTag,
+    projectMembers: List<Member>,
     nav : NavController
 ){
 
     val pagingItem = viewModel.pagingFlow.collectAsLazyPagingItems()
 
+    LaunchedEffect(nav) {
+        pagingItem.refresh()
+    }
+
     Screen(
         modifier = modifier,
         pagingItem = pagingItem,
+        youTag = youTag,
         onClickBackArrow = { nav.popBackStack() },
         onTicketCreate = { nav.navigate(TicketCreation(
             ticket = MagicTicket(projectId = project.id ?: ""),
             members = project.members ?: listOf()
-        )) }
+        )) },
+        onClickTicket = {ticketId ->
+            nav.navigate(TicketDetails(
+                projectId = project.id ?: "",
+                ticketId = ticketId,
+                youTag = youTag,
+                listOfMember = projectMembers
+            ))
+        }
     )
 }
 
 @Composable
 private fun Screen(
     modifier : Modifier = Modifier,
+    youTag: UserTag,
     pagingItem : LazyPagingItems<Ticket>,
     onClickBackArrow : () -> Unit,
-    onTicketCreate: () -> Unit
+    onTicketCreate: () -> Unit,
+    onClickTicket: (String) -> Unit
 ){
     var create by remember { mutableStateOf(false) }
 
@@ -107,14 +130,16 @@ private fun Screen(
                     text = "Lista Ticket"
                 )
 
-                IconButton(
-                    modifier = Modifier.size(35.dp),
-                    onClick = {create = true},
-                ) {
-                    Image(
-                        painter = painterResource(R.drawable.icons8_pi__480),
-                        contentDescription = null
-                    )
+                if(youTag != UserTag.viewer){
+                    IconButton(
+                        modifier = Modifier.size(35.dp),
+                        onClick = {create = true},
+                    ) {
+                        Image(
+                            painter = painterResource(R.drawable.icons8_pi__480),
+                            contentDescription = null
+                        )
+                    }
                 }
             }
         }
@@ -130,7 +155,8 @@ private fun Screen(
                 if(item != null){
                     TicketCard(
                         modifier = Modifier.padding(bottom = 8.dp),
-                        ticket = item
+                        ticket = item,
+                        onClickTicket = onClickTicket
                     )
                 }
             }
@@ -155,6 +181,7 @@ val Purple = Color(0xff845fee)
 fun TicketCard(
     modifier: Modifier = Modifier,
     ticket: Ticket,
+    onClickTicket : (String) -> Unit
 ) {
 
     val tag = ticket.getTicketStatus()
@@ -166,6 +193,9 @@ fun TicketCard(
     }
 
     Card(
+        onClick = {
+            onClickTicket(ticket.id ?: "")
+        },
         modifier = modifier,
         colors = CardDefaults.cardColors(
             containerColor = borderColor

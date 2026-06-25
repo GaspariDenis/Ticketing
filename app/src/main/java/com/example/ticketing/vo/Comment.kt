@@ -4,9 +4,9 @@ import kotlinx.serialization.Serializable
 
 @Serializable
 data class Comment(
-    val id : String?,
-    val body : String?,
-    val ticketId : String?,
-    val userId : String?,
-    val createAt : String?
+    val id : String? = null,
+    val body : String? = null,
+    val ticketId : String? = null,
+    val userId : String? = null,
+    val createAt : String? = null
 )
