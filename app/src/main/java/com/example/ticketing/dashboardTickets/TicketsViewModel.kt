@@ -9,6 +9,7 @@ import androidx.paging.PagingData
 import androidx.paging.cachedIn
 import com.example.ticketing.paging.TicketPagingSource
 import com.example.ticketing.repository.TicketRepository
+import com.example.ticketing.vo.Project
 import com.example.ticketing.vo.Ticket
 import dagger.assisted.Assisted
 import dagger.assisted.AssistedFactory
@@ -30,7 +31,9 @@ class TicketsViewModel @Inject constructor(
             enablePlaceholders = true
         ),
         pagingSourceFactory = {
-            TicketPagingSource(backend = repo, projectId = checkNotNull(saveStateHandle["projectId"]))
+            TicketPagingSource(
+                backend = repo,
+                projectId = checkNotNull(saveStateHandle["projectId"]))
         }
     ).flow.cachedIn(viewModelScope)
 }

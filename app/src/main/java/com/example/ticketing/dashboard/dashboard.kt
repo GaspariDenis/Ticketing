@@ -60,6 +60,7 @@ import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavController
 import com.example.ticketing.R
+import com.example.ticketing.auth.Auth
 import com.example.ticketing.projectDetails.ProjectDetails
 import com.example.ticketing.ui.utils.Alert
 import com.example.ticketing.ui.utils.MemberTag
@@ -86,6 +87,14 @@ fun DashboardScreen(
     val triggerError by viewModel.errorEvent.collectAsStateWithLifecycle(initialValue = "")
 
     val list by viewModel.projects.collectAsStateWithLifecycle(initialValue = listOf())
+
+    val logged by viewModel.isLogged.collectAsStateWithLifecycle(initialValue = true)
+
+    LaunchedEffect(logged) {
+        if(!logged){
+            nav.navigate(Auth)
+        }
+    }
 
     Screen(
         modifier = modifier,
@@ -224,7 +233,9 @@ fun Screen(
             }
         }
     ) { paddingValues ->
-        LazyColumn(modifier = Modifier.fillMaxSize().padding(paddingValues)){
+        LazyColumn(modifier = Modifier
+            .fillMaxSize()
+            .padding(paddingValues)){
             items(items = listOfProjects, itemContent = {item ->
                 ProjectCard(
                     title = item.name ?: "Unnamed project",
@@ -248,9 +259,10 @@ fun ProjectCard(
     nav: NavController
 ) {
     Card(
-        modifier = modifier.padding(top = 14.dp)
+        modifier = modifier
+            .padding(top = 14.dp)
             .clickable(onClick = {
-                nav.navigate(ProjectDetails(projectId = projectId))
+                nav.navigate(ProjectDetails(projectId = projectId, userTag = userTag))
             }),
     ) {
         Column(
@@ -259,7 +271,9 @@ fun ProjectCard(
             Row(
             ) {
                 Text(
-                    modifier = Modifier.fillMaxWidth().weight(1f),
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .weight(1f),
                     fontSize = 25.sp,
                     fontWeight = FontWeight.Bold,
                     color = Color.White,
@@ -304,7 +318,9 @@ fun createProject(
             )
 
             TextField(
-                modifier = Modifier.fillMaxWidth().height(150.dp),
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .height(150.dp),
                 text = description,
                 onChange = { str -> description = str},
                 labelText = "Descrizione",
@@ -354,7 +370,7 @@ fun createProject(
                         fontWeight = FontWeight.Bold,
                         fontSize = 22.sp,
                         color = Color.White,
-                        text = stringResource(R.string.auth_access)
+                        text = "CREA PROGETTO"
                     )
                 }
             }

@@ -41,6 +41,7 @@ class AuthViewModel @Inject constructor(
 
             when(status){
                 is APIStatus.Success -> {
+                    isLogged.update { true }
                     userToken = status.data
                     isLoading.update { false }
                 }

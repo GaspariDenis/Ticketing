@@ -49,9 +49,10 @@ class AuthRepository @Inject constructor(val api : APIService) {
             withContext(Dispatchers.IO){
                 tmp = dao.getLocalToken()
             }
+            Log.d(tag, "Return ${tmp.userId != ""}.")
             return tmp.userId != ""
         }catch (e : Exception){
-            Log.w(tag, e.message ?: "Unexpected Error.")
+            Log.w(tag, "${e.message ?: "Unexpected Error"}, return false" )
             return false
         }
     }
@@ -106,12 +107,16 @@ class AuthRepository @Inject constructor(val api : APIService) {
     suspend fun logoutAccount() : APIStatus<Unit> {
         return try {
             val dbtoken = dao.getLocalToken()
-            dao.removeLocalToken(dbtoken.userId)
-            val response = api.logoutAccount(dbtoken.refreshToken)
+            val response = api.logoutAccount(UserToken(
+                accessToken = dbtoken.accessToken,
+                refreshToken = dbtoken.refreshToken,
+                id = dbtoken.userId
+            ))
 
             when(response.code()) {
                 204 -> {
                     Log.d(tag, "Logout successfully.")
+                    dao.removeLocalToken(dbtoken.userId)
                     APIStatus.Success(Unit)
                 }
                 401 -> APIStatus.ErrorAPI(
@@ -172,7 +177,7 @@ class AuthRepository @Inject constructor(val api : APIService) {
             val response = api.registerAccount(account)
 
             return when(response.code()) {
-                200 -> {
+                201 -> {
                     val body = response.body() ?: throw Exception("the body was empty.")
                     APIStatus.Success(body)
                 }

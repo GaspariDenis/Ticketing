@@ -21,7 +21,7 @@ class TicketPagingSource(
 
             var page : List<Ticket> = listOf()
             when(response){
-                is APIStatus.Success -> page = response.data.data
+                is APIStatus.Success -> page = response.data.data ?: throw Exception("The list was null.")
                 is APIStatus.Loading -> {}
                 is APIStatus.ErrorAPI -> { Log.e(tag, response.errorMessage()) }
                 is APIStatus.Error -> {Log.e(tag, response.e.message ?: "Unexpected Error.")}

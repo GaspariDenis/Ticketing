@@ -54,7 +54,6 @@ fun AuthenticationScreen(
     var email by remember { mutableStateOf("") }
     var password by remember { mutableStateOf("") }
 
-
     LaunchedEffect(true) {
         viewModel.checkLogged()
     }
@@ -146,6 +145,8 @@ private fun Content(
             }
         )
 
+        Spacer(Modifier.padding(top = 16.dp))
+
         Button(
             onClick = {
                 onClickButton(email, password)
@@ -200,7 +201,7 @@ private fun Content(
             colors = ButtonDefaults.buttonColors(
                 containerColor = Color(0x00ffffff)
             ),
-            enabled = isValid(email, password),
+            enabled = true,
             contentPadding = PaddingValues()
         ) {
             Box(

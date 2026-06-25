@@ -1,0 +1,295 @@
+package com.example.ticketing.ticketChange
+
+import androidx.compose.foundation.background
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.PaddingValues
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material3.Button
+import androidx.compose.material3.ButtonDefaults
+import androidx.compose.material3.DropdownMenuItem
+import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.ExposedDropdownMenuBox
+import androidx.compose.material3.OutlinedTextField
+import androidx.compose.material3.ExposedDropdownMenuAnchorType
+import androidx.compose.material3.ExposedDropdownMenuDefaults
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
+import androidx.compose.material3.OutlinedTextFieldDefaults
+import androidx.compose.material3.Scaffold
+import androidx.compose.material3.Text
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
+import androidx.compose.ui.Alignment
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Brush
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextOverflow
+import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
+import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
+import androidx.lifecycle.LifecycleOwner
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import androidx.navigation.NavController
+import com.example.ticketing.R
+import com.example.ticketing.ui.utils.Alert
+import com.example.ticketing.ui.utils.PriorityTagCard
+import com.example.ticketing.ui.utils.TextField
+import com.example.ticketing.vo.MagicTicket
+import com.example.ticketing.vo.Member
+import com.example.ticketing.vo.PriorityTag
+import com.example.ticketing.vo.Ticket
+import com.example.ticketing.vo.UserTag
+import kotlinx.serialization.Serializable
+
+@Serializable
+data class TicketCreation(
+    val members : List<Member>,
+    val ticket: Ticket
+)
+
+@Composable
+fun TicketChangeScreen(
+    modifier: Modifier = Modifier,
+    viewModel: TicketChangeViewModel = hiltViewModel(),
+    nav : NavController,
+    ticket: Ticket,
+    members: List<Member>
+){
+
+    val error by viewModel.errorEvent.collectAsStateWithLifecycle(initialValue = "")
+
+    if(ticket.id == MagicTicket("").id){
+        val success by viewModel.creationSuccess.collectAsStateWithLifecycle(initialValue = false)
+
+        CreationScreen(
+            modifier = modifier,
+            memberList = members,
+            error = error,
+            clearError = viewModel::resetErrorEvent,
+            onClickBackArrow = { nav.popBackStack() },
+            onClick = {title, desc, prio, mem ->
+                viewModel.createTicket(ticket.projectId!!, title, desc, prio, mem)
+            },
+            isValid = viewModel::isValid
+        )
+
+        LaunchedEffect(success) {
+            if(success)
+                nav.popBackStack()
+        }
+
+    }else{
+
+    }
+}
+
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+private fun CreationScreen(
+    modifier : Modifier = Modifier,
+    memberList : List<Member>,
+    error: String,
+    clearError : () -> Unit,
+    onClickBackArrow : () -> Unit,
+    onClick : (String, String, PriorityTag, Member) -> Unit,
+    isValid : (String, String, Member) -> Boolean
+) {
+    var title by remember { mutableStateOf("") }
+    var description by remember { mutableStateOf("") }
+    var priority by remember { mutableStateOf(PriorityTag.low) }
+    var assigned by remember { mutableStateOf(Member()) }
+    var option by remember { mutableStateOf("") }
+
+    var isExpanded by remember { mutableStateOf(false) }
+
+    Scaffold(
+        modifier = Modifier.fillMaxSize(),
+        topBar = {
+            Row(
+                modifier = modifier.fillMaxWidth(),
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+
+                IconButton(
+                    onClick = onClickBackArrow
+                ){
+                    Icon(
+                        modifier = Modifier
+                            .size(40.dp)
+                            .padding(end = 4.dp),
+                        painter = painterResource(R.drawable.left_arrow),
+                        contentDescription = null
+                    )
+                }
+
+                Text(
+                    modifier = Modifier.fillMaxWidth().weight(1f),
+                    color = Color.White,
+                    fontWeight = FontWeight.Bold,
+                    fontSize = 30.sp,
+                    text = "Creazione Ticket"
+                )
+            }
+        },
+        bottomBar = {
+            Button(
+                onClick = {
+                    onClick(title, description, priority, assigned)
+                },
+                shape = RoundedCornerShape(16.dp),
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .height(60.dp)
+                    .padding(start = 16.dp, end = 16.dp, bottom = 20.dp),
+                colors = ButtonDefaults.buttonColors(
+                    containerColor = Color(0x00ffffff)
+                ),
+                enabled = isValid(title, description, assigned),
+                contentPadding = PaddingValues()
+            ) {
+                Box(
+                    modifier = Modifier
+                        .fillMaxSize()
+                        .background(
+                            brush =
+                                if (isValid(title, description, assigned)) Brush.horizontalGradient(
+                                    colors = listOf(Color(0xff845fee), Color(0xff4e80ee))
+                                )
+                                else
+                                    Brush.horizontalGradient(
+                                        colors = listOf(Color(0xffaabef0), Color(0xffceb9fa))
+                                    )
+                        ),
+                    contentAlignment = Alignment.Center,
+                ){
+                    Text(
+                        modifier = Modifier
+                        ,
+                        fontWeight = FontWeight.Bold,
+                        fontSize = 22.sp,
+                        color = Color.White,
+                        text = "CREA TICKET"
+                    )
+                }
+            }
+        }
+    ) {innerpadding ->
+        Column(modifier = Modifier.padding(innerpadding).padding(start = 16.dp, end = 16.dp)) {
+            TextField(
+                modifier = Modifier.fillMaxWidth(),
+                text = title,
+                onChange = {str -> title = str},
+                labelText = "Titolo Ticket",
+                labelColor = Color(0xff9b86e7),
+                placeholder = {}
+            )
+
+            TextField(
+                modifier = Modifier.fillMaxWidth().height(120.dp),
+                text = description,
+                onChange = {str -> description = str},
+                labelText = "Desccrizione Ticket",
+                labelColor = Color(0xff9b86e7),
+                maxLine = 5,
+                singleLine = false,
+                placeholder = {}
+            )
+
+            Spacer(modifier = Modifier.height(8.dp))
+
+            Text(
+                text = "Priorità"
+            )
+            Row{
+                PriorityTagCard(
+                    modifier = Modifier.padding(end = 12.dp),
+                    PriorityTag.low,
+                    onClick = { tag ->
+                        priority = tag
+                    },
+                    isClicked = priority == PriorityTag.low
+                )
+                PriorityTagCard(
+                    modifier = Modifier.padding(end = 12.dp),
+                    PriorityTag.medium,
+                    onClick = {tag ->
+                        priority = tag
+                    },
+                    isClicked = priority == PriorityTag.medium
+                )
+                PriorityTagCard(
+                    modifier = Modifier.padding(end = 12.dp),
+                    PriorityTag.high,
+                    onClick = {tag->
+                        priority = tag
+                    },
+                    isClicked = priority == PriorityTag.high
+                )
+            }
+
+            Spacer(Modifier.height(16.dp))
+
+            ExposedDropdownMenuBox(
+                expanded = isExpanded,
+                onExpandedChange = {isExpanded = !isExpanded}
+            ) {
+                OutlinedTextField(
+                    modifier = Modifier.menuAnchor(ExposedDropdownMenuAnchorType.PrimaryEditable).fillMaxWidth(),
+                    shape = OutlinedTextFieldDefaults.shape,
+                    value = option,
+                    onValueChange = {},
+                    readOnly = true,
+                    label = {Text(
+                        fontSize = 17.sp,
+                        fontWeight = FontWeight.SemiBold,
+                        color = Color(0xff9b86e7),
+                        overflow = TextOverflow.Ellipsis,
+                        text = "Assegnato a:"
+                    )},
+                    trailingIcon = { ExposedDropdownMenuDefaults.TrailingIcon(expanded = isExpanded) }
+                )
+
+                ExposedDropdownMenu(
+                    expanded = isExpanded,
+                    onDismissRequest = { isExpanded = false }
+                ) {
+                    memberList.forEach { member ->
+                        if(member.getRole() != UserTag.viewer){
+                            DropdownMenuItem(
+                                text = { Text(member.user?.name ?: "Name not found") },
+                                onClick = {
+                                    option = member.user?.name ?: "Name not found"
+                                    assigned = member
+                                }
+                            )
+                        }
+                    }
+                }
+            }
+        }
+    }
+
+    if(error != ""){
+        Alert(
+            title = "ERROR",
+            message = error,
+            onDismiss = {},
+            onConfirm = clearError
+        )
+    }
+}

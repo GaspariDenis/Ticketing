@@ -4,6 +4,9 @@ import kotlinx.serialization.Serializable
 
 @Serializable
 data class Comment(
-    val content : String,
-    val commentId : String
+    val id : String?,
+    val body : String?,
+    val ticketId : String?,
+    val userId : String?,
+    val createAt : String?
 )

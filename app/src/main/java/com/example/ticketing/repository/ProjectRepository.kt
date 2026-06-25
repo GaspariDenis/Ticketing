@@ -51,7 +51,7 @@ class ProjectRepository @Inject constructor(
             ))
 
             when(response.code()){
-                200 -> {
+                201 -> {
                     APIStatus.Success(response.body() ?: throw Exception("the body was empty."))
                 }
                 400, 401 -> {
@@ -92,7 +92,7 @@ class ProjectRepository @Inject constructor(
 
     suspend fun updateProject(project : UIProject) : APIStatus<Project> {
         return try{
-            val response = api.updateProject(project.id, project.name, project.description)
+            val response = api.updateProject(project.id, project)
 
             when(response.code()){
                 200 -> {
@@ -141,7 +141,6 @@ class ProjectRepository @Inject constructor(
 
             when (response.code()) {
                 200 -> {
-                    Log.d(tag, "Project deleted successfully.")
                     APIStatus.Success(response.body() ?: throw Exception("The body wa empty"))
                 }
 

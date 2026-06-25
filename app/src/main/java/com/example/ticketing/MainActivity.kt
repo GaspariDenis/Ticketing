@@ -4,6 +4,7 @@ import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
+import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.Scaffold
@@ -20,11 +21,22 @@ import com.example.ticketing.dashboardTickets.DashboardTickets
 import com.example.ticketing.dashboardTickets.DashboardTicketsScreen
 import com.example.ticketing.projectDetails.ProjectDetails
 import com.example.ticketing.projectDetails.ProjectDetailsScreen
+import com.example.ticketing.projectSetting.ProjectSetting
+import com.example.ticketing.projectSetting.ProjectSettingScreen
 import com.example.ticketing.register.Register
 import com.example.ticketing.register.RegisterScreen
+import com.example.ticketing.ticketChange.TicketCreation
+import com.example.ticketing.ticketChange.TicketChangeScreen
 import com.example.ticketing.ui.theme.TicketingTheme
+import com.example.ticketing.vo.Member
+import com.example.ticketing.vo.MemberListCustomNavType
+import com.example.ticketing.vo.Project
+import com.example.ticketing.vo.ProjectCustomNavType
+import com.example.ticketing.vo.Ticket
+import com.example.ticketing.vo.TicketCustomNavType
 import dagger.hilt.android.AndroidEntryPoint
-import kotlinx.serialization.Serializable
+import kotlin.reflect.typeOf
+
 
 @AndroidEntryPoint
 class MainActivity : ComponentActivity() {
@@ -53,6 +65,7 @@ class MainActivity : ComponentActivity() {
                             ProjectDetailsScreen(
                                 modifier = Modifier.padding(innerPadding),
                                 projectId = fallback.toRoute<ProjectDetails>().projectId,
+                                userTag = fallback.toRoute<ProjectDetails>().userTag,
                                 nav = navController
                             )
                         }
@@ -61,9 +74,34 @@ class MainActivity : ComponentActivity() {
                                 nav = navController
                             )
                         }
-                        composable<DashboardTickets> {
+                        composable<DashboardTickets>(
+                            typeMap = mapOf(typeOf<Project>() to ProjectCustomNavType)
+                        ) {fallback ->
                             DashboardTicketsScreen(
+                                project = fallback.toRoute<DashboardTickets>().project,
+                                modifier = Modifier.padding(innerPadding),
                                 nav = navController
+                            )
+                        }
+                        composable<TicketCreation>(
+                            typeMap = mapOf(typeOf<Ticket>() to TicketCustomNavType,
+                                            typeOf<List<Member>>() to MemberListCustomNavType
+                            )
+                        ){ fallback ->
+                            TicketChangeScreen(
+                                modifier = Modifier.padding(innerPadding),
+                                nav = navController,
+                                ticket = fallback.toRoute<TicketCreation>().ticket,
+                                members = fallback.toRoute<TicketCreation>().members
+                            )
+                        }
+                        composable<ProjectSetting>(
+                            typeMap = mapOf(typeOf<Project>() to ProjectCustomNavType)
+                        ) {fallback ->
+                            ProjectSettingScreen(
+                                modifier = Modifier.padding(innerPadding),
+                                nav = navController,
+                                project = fallback.toRoute<ProjectSetting>().project
                             )
                         }
                     }

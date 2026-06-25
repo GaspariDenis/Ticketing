@@ -8,6 +8,7 @@ import com.example.ticketing.vo.Member
 import com.example.ticketing.vo.Project
 import com.example.ticketing.vo.RegisterUser
 import com.example.ticketing.vo.Ticket
+import com.example.ticketing.vo.UIProject
 import com.example.ticketing.vo.User
 import com.example.ticketing.vo.UserToken
 import com.google.gson.annotations.SerializedName
@@ -41,7 +42,7 @@ interface APIService {
 
     @POST("/auth/logout")
     suspend fun logoutAccount(
-        @Body refreshToken: String
+        @Body refreshToken: UserToken
     ) : Response<String>
 
 //Projects
@@ -59,17 +60,16 @@ interface APIService {
         @Path("id") id : String
     ) : Response<Project>
 
-    @PUT("/projects")
+    @PUT("/projects/{id}")
     suspend fun updateProject(
-        @Query("id") id : String,
-        @Body name: String,
-        @Body description: String
+        @Path("id") id : String,
+        @Body project : UIProject
     ) : Response<Project>
 
-    @DELETE("/projects")
+    @DELETE("/projects/{id}")
     suspend fun deleteProject(
-        @Query("id") id: String
-    ) : Response<Nothing>
+        @Path("id") id: String
+    ) : Response<String>
 
 //Members
     @POST("/projects/{id}/members")
@@ -134,14 +134,14 @@ interface APIService {
         @Path("id") projectId: String,
         @Path("ticketId") ticketId: String,
         @Body comment: Comment
-    ) : Response<Nothing>
+    ) : Response<Comment>
 
     @DELETE("/projects/{id}/tickets/{ticketId}/comments/{commentId}")
     suspend fun deleteComment(
         @Path("id") projectId: String,
         @Path("ticketId") ticketId: String,
         @Path("commentId") commentId : String
-    ) : Response<Nothing>
+    ) : Response<String>
 }
 
 sealed interface APIStatus<out T> {

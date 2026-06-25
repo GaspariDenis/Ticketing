@@ -48,6 +48,7 @@ import androidx.navigation.NavController
 import androidx.room.util.TableInfo
 import com.example.ticketing.R
 import com.example.ticketing.dashboardTickets.DashboardTickets
+import com.example.ticketing.projectSetting.ProjectSetting
 import com.example.ticketing.ui.utils.Alert
 import com.example.ticketing.ui.utils.MemberTag
 import com.example.ticketing.ui.utils.TextField
@@ -61,6 +62,7 @@ import java.sql.Date
 
 @Serializable
 data class ProjectDetails(
+    val userTag: UserTag,
     val projectId : String
 )
 
@@ -70,6 +72,7 @@ fun ProjectDetailsScreen(
     modifier: Modifier = Modifier,
     viewModel: ProjectViewModel = hiltViewModel(),
     nav : NavController,
+    userTag: UserTag,
     projectId: String
 ){
     val project by viewModel.project.collectAsStateWithLifecycle(initialValue = Project())
@@ -85,10 +88,14 @@ fun ProjectDetailsScreen(
         projectId = projectId,
         projectName = project.name ?: "Unnamed Project",
         createDate = project.getFormattedDate(),
-        isOwner = true,
+        isOwner = userTag == UserTag.owner,
         memberList = project.members ?: listOf(),
         error = triggerError,
-        seeTickets = { nav.navigate(DashboardTickets(projectId)) },
+        seeTickets = { nav.navigate(DashboardTickets(
+            projectId = projectId,
+            project = project
+        )) },
+        onClickSetting = { nav.navigate(ProjectSetting(project = project)) },
         onClickBackArrow = { nav.popBackStack() },
         addMember = viewModel::addMember,
         canRemoveOwner = viewModel::canRemoveOwner,
@@ -108,6 +115,7 @@ private fun Screen(
     memberList : List<Member>,
     error : String,
     seeTickets : () -> Unit,
+    onClickSetting : () -> Unit,
     canRemoveOwner:(List<Member>) -> Boolean,
     addMember: (String, String, UserTag) -> Unit,
     onClickBackArrow: () -> Unit,
@@ -164,6 +172,18 @@ private fun Screen(
                     fontSize = 28.sp,
                     text = "Dettaglio Progetto"
                 )
+
+                if(isOwner){
+                    IconButton(
+                        onClick = onClickSetting
+                    ){
+                        Icon(
+                            modifier = Modifier.size(40.dp),
+                            painter = painterResource(R.drawable.config_icon),
+                            contentDescription = null
+                        )
+                    }
+                }
             }
         }
     ) { paddingValues ->

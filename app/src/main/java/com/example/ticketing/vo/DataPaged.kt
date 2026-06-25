@@ -4,6 +4,6 @@ import kotlinx.serialization.Serializable
 
 @Serializable
 data class DataPaged<T>(
-    val data : List<T>,
-    val pagination : Page
+    val data : List<T>?,
+    val pagination : Page?
 )

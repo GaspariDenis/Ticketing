@@ -1,6 +1,9 @@
 package com.example.ticketing.vo
 
+import android.os.Bundle
+import androidx.navigation.NavType
 import kotlinx.serialization.Serializable
+import kotlinx.serialization.json.Json
 import java.time.Instant
 import java.time.LocalDateTime
 import java.time.ZoneId
@@ -29,5 +32,23 @@ data class Project(
             .withZone(fusoOrario)
 
         return formatter.format(instant)
+    }
+}
+
+val ProjectCustomNavType = object : NavType<Project>(isNullableAllowed = false) {
+    override fun put(bundle: Bundle, key: String, value: Project) {
+        bundle.putSerializable(key, Json.encodeToString(value))
+    }
+
+    override fun get(bundle: Bundle, key: String): Project? {
+        return bundle.getString(key)?.let { Json.decodeFromString(it) }
+    }
+
+    override fun parseValue(value: String): Project {
+        return Json.decodeFromString(android.net.Uri.decode(value))
+    }
+
+    override fun serializeAsValue(value: Project): String {
+        return android.net.Uri.encode(Json.encodeToString(value))
     }
 }

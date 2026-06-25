@@ -28,6 +28,8 @@ class dashboardViewModel @Inject constructor (
 
     val projects = MutableStateFlow(listOf<Project>())
 
+    val isLogged = MutableStateFlow(true)
+
     fun resetErrorEvent() {
         errorEvent.update { "" }
     }
@@ -72,7 +74,7 @@ class dashboardViewModel @Inject constructor (
             val status = repoAuth.logoutAccount()
 
             when(status) {
-                is APIStatus.Success -> {}
+                is APIStatus.Success -> { isLogged.update { false } }
                 is APIStatus.Loading -> {}
                 is APIStatus.ErrorAPI -> errorEvent.update { status.errorMessage() }
                 is APIStatus.Error -> errorEvent.update { status.e.message ?: "" }
