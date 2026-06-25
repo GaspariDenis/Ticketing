@@ -52,7 +52,7 @@ fun PriorityTagCard(
         onClick = {
             onClick(tag)
         },
-        modifier = modifier.width(75.dp),
+        modifier = modifier.width(80.dp),
         colors = if(isClicked){
             CardDefaults.cardColors(
                 containerColor = clickedContainerColor,

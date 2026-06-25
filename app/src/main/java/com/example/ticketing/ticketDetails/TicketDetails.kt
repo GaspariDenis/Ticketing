@@ -234,6 +234,23 @@ private fun Screen(
                 }
             }
 
+            Card(
+                modifier = Modifier.padding(bottom = 16.dp),
+                colors = CardDefaults.cardColors(
+                    containerColor = borderColor
+                )
+            ) {
+                Card(
+                    modifier = Modifier.fillMaxWidth().padding(start = 8.dp)
+                ){
+                    Text(
+                        modifier = Modifier.padding(start = 16.dp, bottom = 16.dp),
+                        fontSize = 16.sp,
+                        text = ticket.description ?: "No description"
+                    )
+                }
+            }
+
             Row(
                 modifier = Modifier.fillMaxWidth(),
                 verticalAlignment = Alignment.CenterVertically

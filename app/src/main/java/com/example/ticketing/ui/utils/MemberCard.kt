@@ -43,7 +43,7 @@ fun MemberTag(tag : UserTag) {
     }
 
     Card(
-        modifier = Modifier.width(90.dp),
+        modifier = Modifier.width(100.dp),
         colors = CardDefaults.cardColors(
             containerColor = containerColor,
         ),
