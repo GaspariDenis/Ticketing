@@ -1,6 +1,5 @@
 package com.example.ticketing.projectDetails
 
-import android.text.BoringLayout
 import android.text.TextUtils
 import android.util.Patterns
 import androidx.lifecycle.ViewModel
@@ -9,9 +8,7 @@ import com.example.ticketing.network.APIStatus
 import com.example.ticketing.repository.ProjectRepository
 import com.example.ticketing.vo.Member
 import com.example.ticketing.vo.Project
-import com.example.ticketing.vo.User
 import com.example.ticketing.vo.UserTag
-import com.example.ticketing.vo.UserToken
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -75,7 +72,7 @@ class ProjectViewModel @Inject constructor(val repo : ProjectRepository) : ViewM
     fun canRemoveOwner(list : List<Member>) : Boolean {
         var count = 0
         for(item in list){
-            if(item.getRole() == UserTag.owner)
+            if(item.getRole() == UserTag.Owner)
                 count++
         }
         return count > 1

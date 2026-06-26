@@ -26,19 +26,19 @@ data class Ticket(
 ){
     fun getTicketStatus() : TicketStatus {
         return when(status){
-            "open" -> TicketStatus.open
-            "closed" -> TicketStatus.closed
-            "in_progress" -> TicketStatus.in_progress
-            else -> TicketStatus.open
+            "open" -> TicketStatus.Open
+            "closed" -> TicketStatus.Closed
+            "in_progress" -> TicketStatus.InProgress
+            else -> TicketStatus.Open
         }
     }
 
     fun getTicketPriority() : PriorityTag {
         return when(priority){
-            "high" -> PriorityTag.high
-            "medium" -> PriorityTag.medium
-            "low" -> PriorityTag.low
-            else -> PriorityTag.low
+            "high" -> PriorityTag.High
+            "medium" -> PriorityTag.Medium
+            "low" -> PriorityTag.Low
+            else -> PriorityTag.Low
         }
     }
 
@@ -48,45 +48,45 @@ data class Ticket(
 
         val instant = Instant.parse(createdAt)
 
-        val fusoOrario = ZoneId.systemDefault()
+        val timeZone = ZoneId.systemDefault()
 
         val formatter = DateTimeFormatter.ofPattern("dd/MM/yyyy HH:mm:ss", Locale.ITALY)
-            .withZone(fusoOrario)
+            .withZone(timeZone)
 
         return formatter.format(instant)
     }
 }
 
-fun MagicTicket(projectId : String) = Ticket(
+fun magicTicket(projectId : String) = Ticket(
     id = "magicTicket",
     projectId = projectId
 )
 
 enum class TicketStatus{
-    open,
-    in_progress,
-    closed
+    Open,
+    InProgress,
+    Closed
 }
 
 enum class PriorityTag {
-    high,
-    medium,
-    low
+    High,
+    Medium,
+    Low
 }
 
 fun getStringFromPriorityTag(tag : PriorityTag) : String {
     return when(tag) {
-        PriorityTag.low -> "low"
-        PriorityTag.medium -> "medium"
-        PriorityTag.high -> "high"
+        PriorityTag.Low -> "low"
+        PriorityTag.Medium -> "medium"
+        PriorityTag.High -> "high"
     }
 }
 
 fun getStringFromStatusTag(tag : TicketStatus) : String {
     return when(tag) {
-        TicketStatus.open -> "open"
-        TicketStatus.in_progress -> "in_progress"
-        TicketStatus.closed -> "closed"
+        TicketStatus.Open -> "open"
+        TicketStatus.InProgress -> "in_progress"
+        TicketStatus.Closed -> "closed"
     }
 }
 

@@ -11,7 +11,6 @@ import com.example.ticketing.repository.AuthRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import javax.inject.Inject
@@ -62,25 +61,18 @@ class AuthViewModel @Inject constructor(
         val email = email.trim()
 
         if(password.chars().count() < 8){
-            //errorEvent.update { "La password deve avere minimo 8 caratteri." }
             return false
         }
 
         if(TextUtils.isEmpty(email)){
-            //errorEvent.update { "Inserisci la tua mail." }
             return false
         }
 
         if(!Patterns.EMAIL_ADDRESS.matcher(email).matches()){
-            //errorEvent.update { "Inserisci una mail valida." }
             return false
         }
 
         return true
-    }
-
-    fun getUserId() : String{
-        return userToken.id ?: throw Exception("Id not found.")
     }
 
     fun checkLogged() {

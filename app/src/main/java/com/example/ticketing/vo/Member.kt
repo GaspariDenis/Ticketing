@@ -15,9 +15,9 @@ data class Member(
 
     fun getRole() : UserTag {
         return when(role?.lowercase()){
-            "owner" -> UserTag.owner
-            "member" -> UserTag.member
-            "viewer" -> UserTag.viewer
+            "owner" -> UserTag.Owner
+            "member" -> UserTag.Member
+            "viewer" -> UserTag.Viewer
             else -> throw Exception("role not fount.")
         }
     }
@@ -25,16 +25,16 @@ data class Member(
 }
 
 enum class UserTag {
-    owner,
-    member,
-    viewer
+    Owner,
+    Member,
+    Viewer
 }
 
 fun stringFromTag(tag: UserTag) : String{
     return when(tag){
-        UserTag.owner -> "owner"
-        UserTag.member -> "member"
-        UserTag.viewer -> "viewer"
+        UserTag.Owner -> "owner"
+        UserTag.Member -> "member"
+        UserTag.Viewer -> "viewer"
     }
 }
 
@@ -52,24 +52,6 @@ val UserTagCustomNavType = object : NavType<UserTag>(isNullableAllowed = false) 
     }
 
     override fun serializeAsValue(value: UserTag): String {
-        return android.net.Uri.encode(Json.encodeToString(value))
-    }
-}
-
-val MemberCustomNavType = object : NavType<Member>(isNullableAllowed = false) {
-    override fun put(bundle: Bundle, key: String, value: Member) {
-        bundle.putSerializable(key, Json.encodeToString(value))
-    }
-
-    override fun get(bundle: Bundle, key: String): Member? {
-        return bundle.getString(key)?.let { Json.decodeFromString(it) }
-    }
-
-    override fun parseValue(value: String): Member {
-        return Json.decodeFromString(android.net.Uri.decode(value))
-    }
-
-    override fun serializeAsValue(value: Member): String {
         return android.net.Uri.encode(Json.encodeToString(value))
     }
 }

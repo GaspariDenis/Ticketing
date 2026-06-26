@@ -7,10 +7,9 @@ import androidx.compose.ui.Modifier
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavController
-import com.example.ticketing.dashboardTickets.DashboardTickets
 import com.example.ticketing.projectDetails.ProjectDetails
 import com.example.ticketing.ui.utils.Alert
-import com.example.ticketing.vo.MagicTicket
+import com.example.ticketing.vo.magicTicket
 import com.example.ticketing.vo.Member
 import com.example.ticketing.vo.Ticket
 import com.example.ticketing.vo.UserTag
@@ -20,7 +19,7 @@ import kotlinx.serialization.Serializable
 data class TicketCreation(
     val members : List<Member>,
     val ticket: Ticket,
-    val userTag: UserTag = UserTag.member
+    val userTag: UserTag = UserTag.Member
 )
 
 @Composable
@@ -35,7 +34,7 @@ fun TicketChangeScreen(
 
     val error by viewModel.errorEvent.collectAsStateWithLifecycle(initialValue = "")
 
-    if (ticket.id == MagicTicket("").id) {
+    if (ticket.id == magicTicket("").id) {
 
         val success by viewModel.creationSuccess.collectAsStateWithLifecycle(initialValue = false)
 
@@ -43,8 +42,8 @@ fun TicketChangeScreen(
             modifier = modifier,
             memberList = members,
             onClickBackArrow = { nav.popBackStack() },
-            onClick = { title, desc, prio, mem ->
-                viewModel.createTicket(ticket.projectId!!, title, desc, prio, mem)
+            onClick = { title, desc, priority, mem ->
+                viewModel.createTicket(ticket.projectId!!, title, desc, priority, mem)
             },
             isValid = viewModel::isValid
         )
@@ -61,9 +60,9 @@ fun TicketChangeScreen(
             onClickBackArrow = { nav.popBackStack() },
             onDelete = {
                 viewModel.deleteTicket(
-                    ticket.projectId ?: "",
-                    ticket.id ?: "",
-                    {
+                    projectId = ticket.projectId ?: "",
+                    ticketId = ticket.id ?: "",
+                    oncSuccess = {
                         nav.navigate(ProjectDetails(
                             userTag = youTag,
                             projectId = ticket.projectId ?: throw Exception("No projectId in ticket")

@@ -43,7 +43,7 @@ class CommentPagingSource(
                 nextKey = nextKey
             )
         }catch (e : Exception){
-            Log.e(tag, e.message ?: "Unexpecte Error,")
+            Log.e(tag, e.message ?: "Unexpected Error.")
             return LoadResult.Error(e)
         }
     }

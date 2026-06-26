@@ -9,11 +9,7 @@ import androidx.paging.PagingData
 import androidx.paging.cachedIn
 import com.example.ticketing.paging.TicketPagingSource
 import com.example.ticketing.repository.TicketRepository
-import com.example.ticketing.vo.Project
 import com.example.ticketing.vo.Ticket
-import dagger.assisted.Assisted
-import dagger.assisted.AssistedFactory
-import dagger.assisted.AssistedInject
 import dagger.hilt.android.lifecycle.HiltViewModel
 import jakarta.inject.Inject
 import kotlinx.coroutines.flow.Flow

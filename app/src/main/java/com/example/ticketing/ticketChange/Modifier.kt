@@ -231,9 +231,9 @@ fun ChangeScreen(
                     onDismissRequest = { isExpandedStatus = false }
                 ) {
                     val value = when(ticket.getTicketStatus()){
-                        TicketStatus.open -> 0
-                        TicketStatus.in_progress -> 1
-                        TicketStatus.closed -> 2
+                        TicketStatus.Open -> 0
+                        TicketStatus.InProgress -> 1
+                        TicketStatus.Closed -> 2
                     }
 
                     if(value < 1){
@@ -241,7 +241,7 @@ fun ChangeScreen(
                             text = { Text("Open") },
                             onClick = {
                                 optionStatus = "OPEN"
-                                status = TicketStatus.open
+                                status = TicketStatus.Open
                             }
                         )
                     }
@@ -250,7 +250,7 @@ fun ChangeScreen(
                             text = { Text("IN PROGRESS") },
                             onClick = {
                                 optionStatus = "IN PROGRESS"
-                                status = TicketStatus.in_progress
+                                status = TicketStatus.InProgress
                             }
                         )
                     }
@@ -259,7 +259,7 @@ fun ChangeScreen(
                             text = { Text("CLOSED") },
                             onClick = {
                                 optionStatus = "CLOSED"
-                                status = TicketStatus.closed
+                                status = TicketStatus.Closed
                             }
                         )
                     }
@@ -274,27 +274,27 @@ fun ChangeScreen(
             Row{
                 PriorityTagCard(
                     modifier = Modifier.padding(end = 12.dp),
-                    PriorityTag.low,
+                    PriorityTag.Low,
                     onClick = { tag ->
                         priority = tag
                     },
-                    isClicked = priority == PriorityTag.low
+                    isClicked = priority == PriorityTag.Low
                 )
                 PriorityTagCard(
                     modifier = Modifier.padding(end = 12.dp),
-                    PriorityTag.medium,
+                    PriorityTag.Medium,
                     onClick = {tag ->
                         priority = tag
                     },
-                    isClicked = priority == PriorityTag.medium
+                    isClicked = priority == PriorityTag.Medium
                 )
                 PriorityTagCard(
                     modifier = Modifier.padding(end = 12.dp),
-                    PriorityTag.high,
+                    PriorityTag.High,
                     onClick = {tag->
                         priority = tag
                     },
-                    isClicked = priority == PriorityTag.high
+                    isClicked = priority == PriorityTag.High
                 )
             }
 
@@ -325,7 +325,7 @@ fun ChangeScreen(
                     onDismissRequest = { isExpandedMember = false }
                 ) {
                     memberList.forEach { member ->
-                        if(member.getRole() != UserTag.viewer){
+                        if(member.getRole() != UserTag.Viewer){
                             DropdownMenuItem(
                                 text = { Text(member.user?.name ?: "Name not found") },
                                 onClick = {

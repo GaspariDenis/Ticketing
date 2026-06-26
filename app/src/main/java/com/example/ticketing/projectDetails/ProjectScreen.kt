@@ -1,29 +1,20 @@
 package com.example.ticketing.projectDetails
 
 import android.annotation.SuppressLint
-import android.service.autofill.OnClickAction
-import android.widget.ImageButton
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
-import androidx.compose.material3.AlertDialog
-import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonColors
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
-import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.Scaffold
-import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
@@ -34,9 +25,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.modifier.modifierLocalConsumer
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
@@ -45,7 +34,6 @@ import androidx.compose.ui.window.Dialog
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavController
-import androidx.room.util.TableInfo
 import com.example.ticketing.R
 import com.example.ticketing.dashboardTickets.DashboardTickets
 import com.example.ticketing.projectSetting.ProjectSetting
@@ -54,11 +42,8 @@ import com.example.ticketing.ui.utils.MemberTag
 import com.example.ticketing.ui.utils.TextField
 import com.example.ticketing.vo.Member
 import com.example.ticketing.vo.Project
-import com.example.ticketing.vo.User
 import com.example.ticketing.vo.UserTag
 import kotlinx.serialization.Serializable
-import okhttp3.internal.checkDuration
-import java.sql.Date
 
 @Serializable
 data class ProjectDetails(
@@ -88,7 +73,7 @@ fun ProjectDetailsScreen(
         projectId = projectId,
         projectName = project.name ?: "Unnamed Project",
         createDate = project.getFormattedDate(),
-        isOwner = userTag == UserTag.owner,
+        isOwner = userTag == UserTag.Owner,
         memberList = project.members ?: listOf(),
         error = triggerError,
         seeTickets = { nav.navigate(DashboardTickets(
@@ -140,7 +125,7 @@ private fun Screen(
     var showAlertForMember by remember { mutableStateOf(false) }
 
     if(showAlertForMember){
-        chooseRole(
+        ChooseRole(
             projectId = projectId,
             email = text,
             onClick = { str1, str2, tag ->
@@ -314,7 +299,7 @@ fun CardMember(
 
             MemberTag(member.getRole())
 
-            if(ImOwner && (canRemoveOwner || member.getRole() != UserTag.owner)){
+            if(ImOwner && (canRemoveOwner || member.getRole() != UserTag.Owner)){
                 IconButton(
                     modifier = Modifier.size(35.dp).padding(start = 8.dp),
                     onClick = {
@@ -332,7 +317,7 @@ fun CardMember(
 }
 
 @Composable
-fun chooseRole(
+fun ChooseRole(
     projectId: String,
     email: String,
     onClick: (String, String, UserTag) -> Unit
@@ -351,29 +336,29 @@ fun chooseRole(
             Card(
                 modifier = Modifier.clickable(
                     onClick = {
-                        onClick(projectId, email, UserTag.owner)
+                        onClick(projectId, email, UserTag.Owner)
                     }
                 )
             ) {
-                MemberTag(UserTag.owner)
+                MemberTag(UserTag.Owner)
             }
             Card(
                 modifier = Modifier.clickable(
                     onClick = {
-                        onClick(projectId, email, UserTag.member)
+                        onClick(projectId, email, UserTag.Member)
                     }
                 )
             ) {
-                MemberTag(UserTag.member)
+                MemberTag(UserTag.Member)
             }
             Card(
                 modifier = Modifier.clickable(
                     onClick = {
-                        onClick(projectId, email, UserTag.viewer)
+                        onClick(projectId, email, UserTag.Viewer)
                     }
                 )
             ) {
-                MemberTag(UserTag.viewer)
+                MemberTag(UserTag.Viewer)
             }
         }
     }

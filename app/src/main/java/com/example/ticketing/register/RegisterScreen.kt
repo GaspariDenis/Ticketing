@@ -5,7 +5,6 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
-import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
@@ -119,7 +118,7 @@ private fun Screen(
             digitPassword = false,
             onChange = {str -> user = str },
             placeholder = {
-                Text("tu@azienda.com")
+                Text("Mario Rossi")
             }
         )
 

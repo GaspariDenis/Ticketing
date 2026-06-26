@@ -1,5 +1,6 @@
 package com.example.ticketing.auth
 
+import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -47,6 +48,8 @@ fun AuthenticationScreen(
     nav : NavController,
     viewModel : AuthViewModel = hiltViewModel()
 ) {
+    BackHandler(enabled = true) { }
+
     val triggerError by viewModel.errorEvent.collectAsStateWithLifecycle(initialValue = "")
 
     val logged by viewModel.isLogged.collectAsStateWithLifecycle(initialValue = false)

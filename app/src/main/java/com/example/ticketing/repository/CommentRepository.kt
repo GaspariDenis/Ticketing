@@ -1,8 +1,6 @@
 package com.example.ticketing.repository
 
 import android.util.Log
-import androidx.core.view.accessibility.AccessibilityViewCommand
-import androidx.room.Insert
 import com.example.ticketing.network.APIService
 import com.example.ticketing.network.APIStatus
 import com.example.ticketing.vo.Comment
@@ -10,7 +8,6 @@ import com.example.ticketing.vo.DataPaged
 import com.example.ticketing.vo.extractError
 import javax.inject.Inject
 import javax.inject.Singleton
-import kotlin.collections.listOf
 
 @Singleton
 class CommentRepository @Inject constructor(

@@ -5,7 +5,6 @@ import androidx.navigation.NavType
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.json.Json
 import java.time.Instant
-import java.time.LocalDateTime
 import java.time.ZoneId
 import java.time.format.DateTimeFormatter
 import java.util.Locale
@@ -26,10 +25,10 @@ data class Project(
 
         val instant = Instant.parse(createdAt)
 
-        val fusoOrario = ZoneId.systemDefault()
+        val timeZone = ZoneId.systemDefault()
 
         val formatter = DateTimeFormatter.ofPattern("dd/MM/yyyy HH:mm:ss", Locale.ITALY)
-            .withZone(fusoOrario)
+            .withZone(timeZone)
 
         return formatter.format(instant)
     }

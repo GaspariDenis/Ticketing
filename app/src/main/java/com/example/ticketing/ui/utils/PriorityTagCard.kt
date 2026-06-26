@@ -8,10 +8,6 @@ import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
@@ -32,21 +28,21 @@ fun PriorityTagCard(
     val clickedBorderColor = Color(0xCCB585F2)
 
     val color = when(tag) {
-        PriorityTag.high -> Color(0xffd8504b)
-        PriorityTag.medium -> Color(0xFFE9a23B)
-        PriorityTag.low -> Color(0xff5d6584)
+        PriorityTag.High -> Color(0xffd8504b)
+        PriorityTag.Medium -> Color(0xFFE9a23B)
+        PriorityTag.Low -> Color(0xff5d6584)
     }
 
     val text = when(tag) {
-        PriorityTag.high -> "HIGH"
-        PriorityTag.medium -> "MEDIUM"
-        PriorityTag.low -> "LOW"
+        PriorityTag.High -> "HIGH"
+        PriorityTag.Medium -> "MEDIUM"
+        PriorityTag.Low -> "LOW"
     }
 
     val containerColor = when(tag)  {
-        PriorityTag.high -> Color(0x88D8504B)
-        PriorityTag.medium -> Color(0x87E9A23B)
-        PriorityTag.low -> Color(0x875D6584)
+        PriorityTag.High -> Color(0x88D8504B)
+        PriorityTag.Medium -> Color(0x87E9A23B)
+        PriorityTag.Low -> Color(0x875D6584)
     }
     Card(
         onClick = {

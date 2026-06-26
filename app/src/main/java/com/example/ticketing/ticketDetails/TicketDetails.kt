@@ -23,7 +23,6 @@ import androidx.compose.material3.IconButton
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.DefaultMonotonicFrameClock
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -35,7 +34,6 @@ import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.text.style.LineHeightStyle
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.window.Dialog
@@ -45,14 +43,10 @@ import androidx.navigation.NavController
 import androidx.paging.compose.LazyPagingItems
 import androidx.paging.compose.collectAsLazyPagingItems
 import androidx.paging.compose.itemKey
-import androidx.room.util.TableInfo
 import com.example.ticketing.R
-import com.example.ticketing.dashboard.createProject
 import com.example.ticketing.dashboardTickets.Green
 import com.example.ticketing.dashboardTickets.Orange
 import com.example.ticketing.dashboardTickets.Purple
-import com.example.ticketing.dashboardTickets.TicketCard
-import com.example.ticketing.projectDetails.CardMember
 import com.example.ticketing.ticketChange.TicketCreation
 import com.example.ticketing.ui.utils.Alert
 import com.example.ticketing.ui.utils.PriorityTagCard
@@ -176,7 +170,7 @@ private fun Screen(
                     text = "Dettaglio Ticket"
                 )
 
-                if(userTag != UserTag.viewer){
+                if(userTag != UserTag.Viewer){
                     IconButton(
                         onClick = onClickEdit
                     ){
@@ -194,9 +188,9 @@ private fun Screen(
             modifier = Modifier.padding(padding)
         ) {
             val borderColor = when(ticket.getTicketStatus()){
-                TicketStatus.open -> Purple
-                TicketStatus.in_progress -> Orange
-                TicketStatus.closed -> Green
+                TicketStatus.Open -> Purple
+                TicketStatus.InProgress -> Orange
+                TicketStatus.Closed -> Green
             }
 
             Card(
@@ -262,7 +256,7 @@ private fun Screen(
                     text = "Commenti (${paging.itemCount})"
                 )
 
-                if(userTag != UserTag.viewer){
+                if(userTag != UserTag.Viewer){
                     IconButton(
                         modifier = Modifier.size(35.dp).padding(start = 8.dp),
                         onClick = { createComment = true }
@@ -328,7 +322,7 @@ private fun CommentCard(
                 text = comment.body ?: "Unknown Text"
             )
 
-            if(userId == comment.userId || userTag == UserTag.owner){
+            if(userId == comment.userId || userTag == UserTag.Owner){
                 IconButton(
                     modifier = Modifier.size(35.dp).padding(start = 8.dp),
                     onClick = {
@@ -355,7 +349,7 @@ private fun CreateComment(
     Dialog(
       onDismissRequest = onDismiss
     ){
-        Column() {
+        Column {
             TextField(
                 singleLine = false,
                 maxLine = 5,

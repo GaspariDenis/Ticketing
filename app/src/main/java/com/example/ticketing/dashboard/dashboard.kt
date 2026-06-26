@@ -1,9 +1,6 @@
 package com.example.ticketing.dashboard
 
-import android.accessibilityservice.GestureDescription
-import android.annotation.SuppressLint
-import android.icu.text.CaseMap
-import androidx.compose.foundation.BorderStroke
+import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
@@ -25,15 +22,12 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Card
-import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.DockedSearchBar
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Scaffold
-import androidx.compose.material3.SearchBar
 import androidx.compose.material3.SearchBarDefaults
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -46,13 +40,8 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.painterResource
-import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.text.font.FontStyle
 import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.text.style.TextAlign
-import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.window.Dialog
@@ -66,9 +55,7 @@ import com.example.ticketing.ui.utils.Alert
 import com.example.ticketing.ui.utils.MemberTag
 import com.example.ticketing.ui.utils.TextField
 import com.example.ticketing.vo.Project
-import com.example.ticketing.vo.User
 import com.example.ticketing.vo.UserTag
-import com.example.ticketing.vo.UserToken
 import kotlinx.serialization.Serializable
 
 @Serializable
@@ -77,9 +64,11 @@ object Home
 @Composable
 fun DashboardScreen(
     modifier: Modifier = Modifier,
-    viewModel: dashboardViewModel = hiltViewModel(),
+    viewModel: DashboardViewModel = hiltViewModel(),
     nav : NavController
 ) {
+    BackHandler(enabled = true) { }
+
     LaunchedEffect(true) {
         viewModel.getAllProject()
     }
@@ -124,7 +113,7 @@ fun Screen(
     var user by remember { mutableStateOf(false) }
 
     if(create){
-        createProject(
+        CreateProject(
             onDismiss = { create = false },
             onClick = { name, description ->
                 onCreateProject(name, description)
@@ -134,7 +123,7 @@ fun Screen(
     }
 
     if(user){
-        userDetail(
+        UserDetail(
             onDismiss = {user = false},
             onClickLogout = {
                 onClickLogout()
@@ -240,7 +229,7 @@ fun Screen(
                 ProjectCard(
                     title = item.name ?: "Unnamed project",
                     description = item.description ?: "No description",
-                    userTag = item.role ?: UserTag.viewer,
+                    userTag = item.role ?: UserTag.Viewer,
                     projectId = item.id ?: "",
                     nav = nav
                 )
@@ -294,7 +283,7 @@ fun ProjectCard(
 }
 
 @Composable
-fun createProject(
+fun CreateProject(
     onDismiss : () -> Unit,
     onClick : (String, String) -> Unit
 ) {
@@ -381,7 +370,7 @@ fun createProject(
 }
 
 @Composable
-fun userDetail(
+fun UserDetail(
     onDismiss: () -> Unit,
     onClickLogout: () -> Unit,
 ){

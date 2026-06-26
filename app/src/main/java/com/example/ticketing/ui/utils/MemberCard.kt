@@ -19,27 +19,27 @@ import com.example.ticketing.vo.UserTag
 fun MemberTag(tag : UserTag) {
 
     val color = when(tag) {
-        UserTag.owner -> Color(0xff50ab7e)
-        UserTag.member -> Color(0xff4773d6)
-        UserTag.viewer -> Color(0xffaa00ff)
+        UserTag.Owner -> Color(0xff50ab7e)
+        UserTag.Member -> Color(0xff4773d6)
+        UserTag.Viewer -> Color(0xffaa00ff)
     }
 
     val text = when(tag){
-        UserTag.owner -> "OWNER"
-        UserTag.member -> "MEMBER"
-        UserTag.viewer -> "VIEWER"
+        UserTag.Owner -> "OWNER"
+        UserTag.Member -> "MEMBER"
+        UserTag.Viewer -> "VIEWER"
     }
 
     val containerColor = when(tag) {
-        UserTag.owner -> Color(0x5050ab7e)
-        UserTag.member -> Color(0x504773d6)
-        UserTag.viewer -> Color(0x50aa00ff)
+        UserTag.Owner -> Color(0x5050ab7e)
+        UserTag.Member -> Color(0x504773d6)
+        UserTag.Viewer -> Color(0x50aa00ff)
     }
 
     val borderColor = when(tag) {
-        UserTag.owner -> Color(0x6f50ab7e)
-        UserTag.member -> Color(0x6f4773d6)
-        UserTag.viewer -> Color(0x6faa00ff)
+        UserTag.Owner -> Color(0x6f50ab7e)
+        UserTag.Member -> Color(0x6f4773d6)
+        UserTag.Viewer -> Color(0x6faa00ff)
     }
 
     Card(

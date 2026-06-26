@@ -7,7 +7,6 @@ import com.example.ticketing.vo.Member
 import com.example.ticketing.vo.Project
 import com.example.ticketing.vo.UIProject
 import com.example.ticketing.vo.UserTag
-import com.example.ticketing.vo.UserToken
 import com.example.ticketing.vo.extractError
 import com.example.ticketing.vo.stringFromTag
 import javax.inject.Inject

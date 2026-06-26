@@ -2,10 +2,8 @@ package com.example.ticketing.ticketChange
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import androidx.lifecycle.viewmodel.compose.viewModel
 import com.example.ticketing.network.APIStatus
 import com.example.ticketing.repository.TicketRepository
-import com.example.ticketing.vo.Member
 import com.example.ticketing.vo.PriorityTag
 import com.example.ticketing.vo.Ticket
 import com.example.ticketing.vo.TicketStatus

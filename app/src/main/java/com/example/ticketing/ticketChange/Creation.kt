@@ -58,7 +58,7 @@ fun CreationScreen(
 ) {
     var title by remember { mutableStateOf("") }
     var description by remember { mutableStateOf("") }
-    var priority by remember { mutableStateOf(PriorityTag.low) }
+    var priority by remember { mutableStateOf(PriorityTag.Low) }
     var assigned by remember { mutableStateOf("") }
     var option by remember { mutableStateOf("") }
 
@@ -165,27 +165,27 @@ fun CreationScreen(
             Row{
                 PriorityTagCard(
                     modifier = Modifier.padding(end = 12.dp),
-                    PriorityTag.low,
+                    PriorityTag.Low,
                     onClick = { tag ->
                         priority = tag
                     },
-                    isClicked = priority == PriorityTag.low
+                    isClicked = priority == PriorityTag.Low
                 )
                 PriorityTagCard(
                     modifier = Modifier.padding(end = 12.dp),
-                    PriorityTag.medium,
+                    PriorityTag.Medium,
                     onClick = {tag ->
                         priority = tag
                     },
-                    isClicked = priority == PriorityTag.medium
+                    isClicked = priority == PriorityTag.Medium
                 )
                 PriorityTagCard(
                     modifier = Modifier.padding(end = 12.dp),
-                    PriorityTag.high,
+                    PriorityTag.High,
                     onClick = {tag->
                         priority = tag
                     },
-                    isClicked = priority == PriorityTag.high
+                    isClicked = priority == PriorityTag.High
                 )
             }
 
@@ -216,7 +216,7 @@ fun CreationScreen(
                     onDismissRequest = { isExpanded = false }
                 ) {
                     memberList.forEach { member ->
-                        if(member.getRole() != UserTag.viewer){
+                        if(member.getRole() != UserTag.Viewer){
                             DropdownMenuItem(
                                 text = { Text(member.user?.name ?: "Name not found") },
                                 onClick = {

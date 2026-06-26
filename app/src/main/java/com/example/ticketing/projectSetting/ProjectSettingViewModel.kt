@@ -1,12 +1,9 @@
 package com.example.ticketing.projectSetting
 
-import android.accessibilityservice.GestureDescription
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import androidx.lifecycle.viewmodel.compose.viewModel
 import com.example.ticketing.network.APIStatus
 import com.example.ticketing.repository.ProjectRepository
-import com.example.ticketing.vo.Project
 import com.example.ticketing.vo.UIProject
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
@@ -29,7 +26,7 @@ class ProjectSettingViewModel @Inject constructor(
         errorEvent.update { "" }
     }
 
-    fun uploaProject(projectId : String, title : String, description: String) {
+    fun uploadProject(projectId : String, title : String, description: String) {
         viewModelScope.launch(Dispatchers.IO) {
             val status = repo.updateProject(UIProject(
                 id = projectId,

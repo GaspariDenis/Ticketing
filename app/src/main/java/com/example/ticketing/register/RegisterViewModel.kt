@@ -4,7 +4,6 @@ import android.text.TextUtils
 import android.util.Patterns
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import androidx.lifecycle.viewmodel.compose.viewModel
 import com.example.ticketing.network.APIStatus
 import com.example.ticketing.repository.AuthRepository
 import com.example.ticketing.vo.RegisterUser

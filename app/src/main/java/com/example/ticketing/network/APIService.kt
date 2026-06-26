@@ -11,7 +11,6 @@ import com.example.ticketing.vo.Ticket
 import com.example.ticketing.vo.UIProject
 import com.example.ticketing.vo.User
 import com.example.ticketing.vo.UserToken
-import com.google.gson.annotations.SerializedName
 import kotlinx.serialization.Serializable
 import retrofit2.Response
 import retrofit2.http.Body

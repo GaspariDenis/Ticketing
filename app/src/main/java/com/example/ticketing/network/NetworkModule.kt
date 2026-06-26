@@ -2,7 +2,6 @@ package com.example.ticketing.network
 
 import android.content.Context
 import android.content.SharedPreferences
-import androidx.navigation.Navigator
 import com.example.ticketing.repository.AuthRepository
 import dagger.Module
 import dagger.Provides
@@ -60,7 +59,7 @@ object NetworkModule {
     //Authenticator
     @Provides
     @Singleton
-    fun providetokenAuthenticator(
+    fun provideTokenAuthenticator(
     @Named(REFRESH) apiService: AuthRepository
     ) : TokenAuthenticator =
         TokenAuthenticator(apiService)

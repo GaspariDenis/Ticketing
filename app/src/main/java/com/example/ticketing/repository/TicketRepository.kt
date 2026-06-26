@@ -1,13 +1,10 @@
 package com.example.ticketing.repository
 
-import android.R
 import android.util.Log
 import com.example.ticketing.network.APIService
 import com.example.ticketing.network.APIStatus
 import com.example.ticketing.vo.DataPaged
-import com.example.ticketing.vo.RegisterUser
 import com.example.ticketing.vo.Ticket
-import com.example.ticketing.vo.User
 import com.example.ticketing.vo.extractError
 import javax.inject.Inject
 import javax.inject.Singleton

@@ -1,6 +1,5 @@
 package com.example.ticketing.dashboardTickets
 
-import android.util.Log
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -10,7 +9,6 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.material.ModalDrawer
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.Icon
@@ -39,7 +37,7 @@ import com.example.ticketing.R
 import com.example.ticketing.ticketChange.TicketCreation
 import com.example.ticketing.ticketDetails.TicketDetails
 import com.example.ticketing.ui.utils.PriorityTagCard
-import com.example.ticketing.vo.MagicTicket
+import com.example.ticketing.vo.magicTicket
 import com.example.ticketing.vo.Member
 import com.example.ticketing.vo.Project
 import com.example.ticketing.vo.Ticket
@@ -77,7 +75,7 @@ fun DashboardTicketsScreen(
         youTag = youTag,
         onClickBackArrow = { nav.popBackStack() },
         onTicketCreate = { nav.navigate(TicketCreation(
-            ticket = MagicTicket(projectId = project.id ?: ""),
+            ticket = magicTicket(projectId = project.id ?: ""),
             members = project.members ?: listOf()
         )) },
         onClickTicket = {ticketId ->
@@ -130,7 +128,7 @@ private fun Screen(
                     text = "Lista Ticket"
                 )
 
-                if(youTag != UserTag.viewer){
+                if(youTag != UserTag.Viewer){
                     IconButton(
                         modifier = Modifier.size(35.dp),
                         onClick = {create = true},
@@ -187,9 +185,9 @@ fun TicketCard(
     val tag = ticket.getTicketStatus()
 
     val borderColor = when(tag){
-        TicketStatus.open -> Purple
-        TicketStatus.in_progress -> Orange
-        TicketStatus.closed -> Green
+        TicketStatus.Open -> Purple
+        TicketStatus.InProgress -> Orange
+        TicketStatus.Closed -> Green
     }
 
     Card(
@@ -245,9 +243,9 @@ fun TicketCard(
                         fontWeight = FontWeight.SemiBold,
                         fontSize = 18.sp,
                         text = when(tag){
-                            TicketStatus.open -> "OPEN"
-                            TicketStatus.in_progress -> "IN PROGERSS"
-                            TicketStatus.closed -> "CLOSED"
+                            TicketStatus.Open -> "OPEN"
+                            TicketStatus.InProgress -> "IN PROGRESS"
+                            TicketStatus.Closed -> "CLOSED"
                         }
                     )
                 }
